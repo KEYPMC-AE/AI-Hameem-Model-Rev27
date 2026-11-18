@@ -135,10 +135,30 @@
 #stageFillCards .fillStage{font-size:13px;color:#ffcf8a;margin-bottom:6px}
 #stageFillCards .fillValue{font-size:18px;font-weight:700}
 @media(max-width:600px){#stageFillCards{left:10px;bottom:10px;gap:5px}#stageFillCards .fillCard{padding:8px 12px}#stageFillCards .fillValue{font-size:15px}}
-#backfillButtons{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;direction:rtl;width:100%;box-sizing:border-box}#backfillButtons .boundaryToggle{width:100%;min-width:0;min-height:52px;padding:8px 3px;gap:4px;box-sizing:border-box;justify-content:center}#backfillButtons .boundaryToggle>span:last-child{font-size:12px!important;white-space:normal;text-align:center}#backfillButtons .boundarySwatch{width:10px;flex-shrink:0}.backfillAngleRow{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;direction:rtl;width:100%;margin:8px 0 12px}.backfillAngleRow .boundaryToggle{width:100%;min-width:0;min-height:52px;padding:8px 3px;gap:4px;box-sizing:border-box;justify-content:center}.backfillAngleRow .boundaryToggle>span:last-child{font-size:12px!important;white-space:nowrap;text-align:center}.backfillAngleRow .boundarySwatch{width:10px;flex-shrink:0}</style>
+#backfillButtons{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;direction:rtl;width:100%;box-sizing:border-box}#backfillButtons .boundaryToggle{width:100%;min-width:0;min-height:52px;padding:8px 3px;gap:4px;box-sizing:border-box;justify-content:center}#backfillButtons .boundaryToggle>span:last-child{font-size:12px!important;white-space:normal;text-align:center}#backfillButtons .boundarySwatch{width:10px;flex-shrink:0}.backfillAngleRow{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;direction:rtl;width:100%;margin:8px 0 12px}.backfillAngleRow .boundaryToggle{width:100%;min-width:0;min-height:52px;padding:8px 3px;gap:4px;box-sizing:border-box;justify-content:center}.backfillAngleRow .boundaryToggle>span:last-child{font-size:12px!important;white-space:nowrap;text-align:center}.backfillAngleRow .boundarySwatch{width:10px;flex-shrink:0}
+#fillVolumeSummary{margin:12px 0 14px;border:1px solid #806648;border-radius:8px;overflow:hidden;background:rgba(45,34,24,.8)}
+#fillVolumeSummary table{width:100%;table-layout:fixed;border-collapse:collapse;direction:rtl;text-align:center;color:#f2ece2;font-family:Arial,Tahoma,sans-serif;line-height:1.45}
+#fillVolumeSummary th,#fillVolumeSummary td{border:1px solid rgba(186,151,105,.36);padding:7px 2px;vertical-align:middle;text-align:center;white-space:nowrap}
+#fillVolumeSummary thead th{background:#493722;color:#f2cf96;font-size:11px;font-weight:700;white-space:normal}
+#fillVolumeSummary thead tr:first-child th{font-size:12px}
+#fillVolumeSummary tbody th{font-size:11.5px;font-weight:700;color:#f0cf9b;background:rgba(97,71,40,.24)}
+#fillVolumeSummary td{font-size:10.5px;font-variant-numeric:tabular-nums;font-weight:500;letter-spacing:-.1px}
+#fillVolumeSummary tbody tr:nth-child(even){background:rgba(186,151,105,.075)}
+#fillVolumeSummary .fillVolumeUnit{display:block;font-size:10px;font-weight:400;color:#d0b58e}
+
+#fillVolumeSummary{position:fixed;left:18px;bottom:18px;z-index:16;width:min(440px,calc(100vw - 36px));margin:0;box-sizing:border-box;background:rgba(35,27,19,.9);box-shadow:0 3px 14px rgba(0,0,0,.3)}
+#fillVolumeSummary td{font-size:13px!important;padding:7px 5px!important}
+#fillVolumeSummary tbody th{font-size:13px!important}
+#fillVolumeSummary thead th{font-size:12px!important}
+#fillVolumeSummary thead tr:first-child th{font-size:13px!important}
+#fillVolumeSummary .fillVolumeUnit{font-size:11px}
+@media(max-width:500px){#fillVolumeSummary{left:10px;bottom:10px;width:calc(100vw - 20px)}#fillVolumeSummary td{font-size:11px!important;padding:6px 2px!important}}
+#fillVolumeSummary[hidden],#fillVolumeSummary tr[hidden]{display:none!important}
+</style>
 </head>
 
 <body>
+<section id="fillVolumeSummary" hidden aria-label="حجم الدفان المطلوب حسب المنسوب والميل"><table><colgroup><col style="width:23%"><col style="width:38.5%"><col style="width:38.5%"></colgroup><thead><tr><th rowspan="2" scope="col">المنسوب</th><th colspan="2" scope="colgroup">حجم الدفان المطلوب <span class="fillVolumeUnit">(متر مكعب)</span></th></tr><tr><th scope="col">ميول 18 درجة</th><th scope="col">ميول 23 درجة</th></tr></thead><tbody><tr data-fill-level="600"><th scope="row"><bdi dir="ltr">+600</bdi></th><td><bdi dir="ltr">156,868,798</bdi></td><td><bdi dir="ltr">100,400,000</bdi></td></tr><tr data-fill-level="700"><th scope="row"><bdi dir="ltr">+700</bdi></th><td><bdi dir="ltr">453,251,225</bdi></td><td><bdi dir="ltr">355,204,400</bdi></td></tr><tr data-fill-level="1000"><th scope="row"><bdi dir="ltr">+1000</bdi></th><td><bdi dir="ltr">2,048,462,761</bdi></td><td><bdi dir="ltr">1,680,000,000</bdi></td></tr></tbody></table></section>
 <div id="loading">جاري تجهيز النموذج المساحي...<div id="loadingTrack"><div id="loadingFill"></div></div><span id="loadingPct">0%</span></div>
 <div id="canvas-container"></div>
 <section id="presentCard" class="presentationCard" aria-label="العرض التقديمي" hidden><span id="presentCount"></span><h2 id="presentTitle"></h2><p id="presentText"></p><nav><button id="presentPrev">السابق</button><button id="presentPlay">إيقاف مؤقت</button><button id="presentNext">التالي</button><button id="presentEnd">إنهاء العرض</button></nav></section>
@@ -181,6 +201,7 @@
 
   <h2>حدود الدفان لزاوية ميل الرامب <bdi dir="ltr">18°</bdi></h2><div class="backfillAngleRow" role="group" aria-label="حدود الدفان 18 درجة"><button type="button" id="boundaryToggle2" class="boundaryToggle" aria-pressed="false" style="--boundary-color:#5a321b"><span class="boundarySwatch"></span><span>حدود <bdi>600</bdi></span></button><button type="button" id="boundaryToggle1" class="boundaryToggle" aria-pressed="false" style="--boundary-color:#5a321b"><span class="boundarySwatch"></span><span>حدود <bdi>700</bdi></span></button><button type="button" id="boundaryToggle0" class="boundaryToggle" aria-pressed="false" style="--boundary-color:#5a321b"><span class="boundarySwatch"></span><span>حدود <bdi>1000</bdi></span></button></div>
 <h2>حدود الدفان لزاوية ميل الرامب <bdi dir="ltr">23°</bdi></h2><div class="backfillAngleRow" role="group" aria-label="حدود الدفان 23 درجة"><button type="button" id="boundaryToggle3" class="boundaryToggle" aria-pressed="false" style="--boundary-color:#5a321b"><span class="boundarySwatch"></span><span>حدود <bdi>600</bdi></span></button><button type="button" id="boundaryToggle4" class="boundaryToggle" aria-pressed="false" style="--boundary-color:#5a321b"><span class="boundarySwatch"></span><span>حدود <bdi>700</bdi></span></button><button type="button" id="boundaryToggle5" class="boundaryToggle" aria-pressed="false" style="--boundary-color:#5a321b"><span class="boundarySwatch"></span><span>حدود <bdi>1000</bdi></span></button></div>
+
 <details id="operationsPanel" style="margin-top:10px"><summary style="cursor:pointer">توزيع التشغيل</summary>
 <label class="chkRow"><input id="chkOperations" type="checkbox"> إظهار الخطوط كاد</label>
 <label class="chkRow"><input id="chkConveyorRealism" type="checkbox" checked> إظهار الخطوط بواقعية</label>
@@ -2125,7 +2146,7 @@ function backfillMaterial(color,width){
    float distanceToStroke=length(vec2(beyond,linePoint.y))-strokeRadius;
    float opacity=1.0-smoothstep(-0.65,0.65,distanceToStroke);
    if(opacity<0.01)discard;
-   gl_FragColor=vec4(lineColor,opacity);
+   gl_FragColor=vec4(lineColor,opacity*0.55);
   }`
  });
 }
@@ -2133,8 +2154,8 @@ for(const boundary of backfillConfig)boundary.color='#5a321b';
 function initBackfillBoundaries(){
  backfillConfig.forEach((boundary,i)=>{
   const group=new THREE.Group();group.name=boundary.name;group.userData.kind='backfill-boundary';scene.add(group);
-  const geometry=backfillGeometry(boundary.paths),line=new THREE.Mesh(geometry,backfillMaterial(boundary.color,8));
-  line.renderOrder=100+i;line.frustumCulled=false;group.add(line);group.userData.diameterMetres=8;
+  const geometry=backfillGeometry(boundary.paths),line=new THREE.Mesh(geometry,backfillMaterial(boundary.color,5));
+  line.renderOrder=100+i;line.frustumCulled=false;group.add(line);group.userData.diameterMetres=5;
   group.visible=false;
   backfillState.groups.push(group);
   const button=document.getElementById('boundaryToggle'+i);
@@ -3699,7 +3720,8 @@ function syncStageFillCards(){
  const key=tour.layer+'|'+routeTourState.leg;if(box.dataset.contentKey===key)return;box.dataset.contentKey=key;box.replaceChildren();
  const card=document.createElement('div');card.className='fillCard';const title=document.createElement('div');title.className='fillStage';title.textContent=tour.layer;const value=document.createElement('div');value.className='fillValue';value.textContent='كمية الدفان: 0 متر مكعب';card.append(title,value);box.append(card);
 }
-function syncPlus600(){syncStageFillCards();[['angle18-600',2],['angle18-700',1],['angle18-1000',0]].forEach(([key,i])=>{const on=mode==='current'&&plus600Active.has(key),group=backfillState.groups[i],button=document.getElementById('boundaryToggle'+i);if(group)group.visible=on;if(button){button.classList.toggle('active',on);button.setAttribute('aria-pressed',String(on));}});['target600','target700','target1000'].forEach((key,j)=>{const on=mode==='current'&&plus600Active.has(key),group=backfillState.groups[j+3],button=document.getElementById('boundaryToggle'+(j+3));if(group)group.visible=on;if(button){button.classList.toggle('active',on);button.setAttribute('aria-pressed',String(on));}});backfillState.revision++;for(const [k,m] of plus600Cache)m.visible=mode==='current'&&plus600Active.has(k);document.querySelectorAll('[data-plus600]').forEach(b=>{const on=plus600Active.has(b.dataset.plus600);b.classList.toggle('active',on);b.setAttribute('aria-pressed',String(on));});syncPlus600Peak();operationsRevision++;}
+function syncFillVolumeSummary(){const table=document.getElementById('fillVolumeSummary');if(!table)return;const levels=new Set();if(mode==='current')for(const key of plus600Active){const spec=plus600Specs[key];if(spec&&[600,700,1000].includes(spec.to))levels.add(spec.to);}table.querySelectorAll('[data-fill-level]').forEach(row=>{row.hidden=!levels.has(Number(row.dataset.fillLevel));});table.hidden=levels.size===0;}
+function syncPlus600(){syncFillVolumeSummary();syncStageFillCards();[['angle18-600',2],['angle18-700',1],['angle18-1000',0]].forEach(([key,i])=>{const on=mode==='current'&&plus600Active.has(key),group=backfillState.groups[i],button=document.getElementById('boundaryToggle'+i);if(group)group.visible=on;if(button){button.classList.toggle('active',on);button.setAttribute('aria-pressed',String(on));}});['target600','target700','target1000'].forEach((key,j)=>{const on=mode==='current'&&plus600Active.has(key),group=backfillState.groups[j+3],button=document.getElementById('boundaryToggle'+(j+3));if(group)group.visible=on;if(button){button.classList.toggle('active',on);button.setAttribute('aria-pressed',String(on));}});backfillState.revision++;for(const [k,m] of plus600Cache)m.visible=mode==='current'&&plus600Active.has(k);document.querySelectorAll('[data-plus600]').forEach(b=>{const on=plus600Active.has(b.dataset.plus600);b.classList.toggle('active',on);b.setAttribute('aria-pressed',String(on));});syncPlus600Peak();operationsRevision++;}
 
 
 // Component identifiers registered from the supplied CAD PDF. Fixed, terrain-draped text.
