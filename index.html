@@ -3901,12 +3901,34 @@ await conveyorReady;
 // Shared colouring for the three 300x300 top options.
 const OPTION_SAND_TINT=.33;            // darker than the surrounding sand
 const OPTION_BENCH_LEVEL=492, OPTION_BENCH_BAND=.9, OPTION_BENCH_GREY=.55;
-function optionBenchGrey(colors,i,height,normals){
- if(Math.abs(height-OPTION_BENCH_LEVEL)>OPTION_BENCH_BAND)return;
- if(normals&&Math.abs(normals[3*i+1])<.9)return;
+function optionGreyPoint(colors,i){
  const luminance=.2126*colors[3*i]+.7152*colors[3*i+1]+.0722*colors[3*i+2];
  const grey=[luminance*1.02,luminance*1.05,luminance*1.14];
  for(let c=0;c<3;c++)colors[3*i+c]+=(grey[c]-colors[3*i+c])*OPTION_BENCH_GREY;
+}
+function optionBenchGrey(colors,i,height,normals){
+ if(Math.abs(height-OPTION_BENCH_LEVEL)>OPTION_BENCH_BAND)return;
+ if(normals&&Math.abs(normals[3*i+1])<.9)return;
+ optionGreyPoint(colors,i);
+}
+// Where a level has no bench of its own, its contour ring is treated as the flat top.
+function optionRingGrey(colors,positions,count,path){
+ const ring=path.points.map(point=>[point[0]-CX,CY-point[1]]);
+ let minX=Infinity,maxX=-Infinity,minZ=Infinity,maxZ=-Infinity;
+ for(const [x,z] of ring){minX=Math.min(minX,x);maxX=Math.max(maxX,x);minZ=Math.min(minZ,z);maxZ=Math.max(maxZ,z);}
+ let tinted=0;
+ for(let i=0;i<count;i++){
+  const x=positions[3*i],z=positions[3*i+2];
+  if(x<minX||x>maxX||z<minZ||z>maxZ)continue;
+  let inside=false;
+  for(let a=0,b=ring.length-1;a<ring.length;b=a++){
+   const [xa,za]=ring[a],[xb,zb]=ring[b];
+   if((za>z)!==(zb>z)&&x<(xb-xa)*(z-za)/(zb-za)+xa)inside=!inside;
+  }
+  if(!inside)continue;
+  optionGreyPoint(colors,i);tinted++;
+ }
+ return tinted;
 }
 let top300Mesh=null,top300Enabled=false,top300Build=null;
 async function buildTop300(){
@@ -4108,6 +4130,7 @@ async function buildOption3(){
   optionBenchGrey(option3Colors,i,y,option3Normals);
   option3Alpha[i]=.64+.06*summit;
  }
+ optionRingGrey(option3Colors,option3Positions,option3Count,optionSummitBoundaries[2]);
  option3Geometry.setAttribute('color',new THREE.BufferAttribute(option3Colors,3));
  option3Geometry.setAttribute('sandAO',new THREE.BufferAttribute(new Float32Array(option3Count).fill(1),1));
  option3Geometry.setAttribute('extensionAlpha',new THREE.BufferAttribute(option3Alpha,1));
