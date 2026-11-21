@@ -3898,6 +3898,16 @@ setLoadingProgress(85,'جاري تجهيز الخطوط والعرض...');await 
 await conveyorReady;
 
 // Independent proposal surface; original survey coordinates and heights retained.
+// Shared colouring for the three 300x300 top options.
+const OPTION_SAND_TINT=.33;            // darker than the surrounding sand
+const OPTION_BENCH_LEVEL=492, OPTION_BENCH_BAND=.9, OPTION_BENCH_GREY=.55;
+function optionBenchGrey(colors,i,height,normals){
+ if(Math.abs(height-OPTION_BENCH_LEVEL)>OPTION_BENCH_BAND)return;
+ if(normals&&Math.abs(normals[3*i+1])<.9)return;
+ const luminance=.2126*colors[3*i]+.7152*colors[3*i+1]+.0722*colors[3*i+2];
+ const grey=[luminance*1.02,luminance*1.05,luminance*1.14];
+ for(let c=0;c<3;c++)colors[3*i+c]+=(grey[c]-colors[3*i+c])*OPTION_BENCH_GREY;
+}
 let top300Mesh=null,top300Enabled=false,top300Build=null;
 async function buildTop300(){
  await hameemAssetReady('top300');
@@ -3919,19 +3929,21 @@ async function buildTop300(){
  top300Geometry.computeVertexNormals();top300Geometry.computeBoundingSphere();
  // Colour, sand texture and transparency copied from the existing +600/+700/+1000 proposals.
  const top300Positions=top300Geometry.attributes.position.array;
+ const top300Normals=top300Geometry.attributes.normal.array;
  const top300Count=top300Positions.length/3;
  const top300Colors=new Float32Array(top300Positions.length);
  const top300Alpha=new Float32Array(top300Count);
  let top300Ymax=-Infinity;
  for(let i=0;i<top300Count;i++){const y=top300Positions[3*i+1];if(y>top300Ymax)top300Ymax=y;}
- const top300SummitRGB=rampColor(SAND_STOPS_CURRENT,1).map(v=>v*.41);
+ const top300SummitRGB=rampColor(SAND_STOPS_CURRENT,1).map(v=>v*OPTION_SAND_TINT);
  for(let i=0;i<top300Count;i++){
   const y=top300Positions[3*i+1];
   const t=(y-STATS.current_zmin)/(STATS.current_zmax-STATS.current_zmin);
-  const rgb=rampColor(SAND_STOPS_CURRENT,t).map(v=>v*.41);
+  const rgb=rampColor(SAND_STOPS_CURRENT,t).map(v=>v*OPTION_SAND_TINT);
   let summit=Math.max(0,Math.min(1,(y-(top300Ymax-1.5))/1.5));
   summit=summit*summit*(3-2*summit);
   for(let c=0;c<3;c++)top300Colors[3*i+c]=rgb[c]+(top300SummitRGB[c]-rgb[c])*summit;
+  optionBenchGrey(top300Colors,i,y,top300Normals);
   top300Alpha[i]=.64+.06*summit;
  }
  top300Geometry.setAttribute('color',new THREE.BufferAttribute(top300Colors,3));
@@ -3998,19 +4010,21 @@ async function buildOption2(){
  option2Geometry.computeVertexNormals();option2Geometry.computeBoundingSphere();
  // Colour, sand texture and transparency copied from the existing +600/+700/+1000 proposals.
  const option2Positions=option2Geometry.attributes.position.array;
+ const option2Normals=option2Geometry.attributes.normal.array;
  const option2Count=option2Positions.length/3;
  const option2Colors=new Float32Array(option2Positions.length);
  const option2Alpha=new Float32Array(option2Count);
  let option2Ymax=-Infinity;
  for(let i=0;i<option2Count;i++){const y=option2Positions[3*i+1];if(y>option2Ymax)option2Ymax=y;}
- const option2SummitRGB=rampColor(SAND_STOPS_CURRENT,1).map(v=>v*.41);
+ const option2SummitRGB=rampColor(SAND_STOPS_CURRENT,1).map(v=>v*OPTION_SAND_TINT);
  for(let i=0;i<option2Count;i++){
   const y=option2Positions[3*i+1];
   const t=(y-STATS.current_zmin)/(STATS.current_zmax-STATS.current_zmin);
-  const rgb=rampColor(SAND_STOPS_CURRENT,t).map(v=>v*.41);
+  const rgb=rampColor(SAND_STOPS_CURRENT,t).map(v=>v*OPTION_SAND_TINT);
   let summit=Math.max(0,Math.min(1,(y-(option2Ymax-1.5))/1.5));
   summit=summit*summit*(3-2*summit);
   for(let c=0;c<3;c++)option2Colors[3*i+c]=rgb[c]+(option2SummitRGB[c]-rgb[c])*summit;
+  optionBenchGrey(option2Colors,i,y,option2Normals);
   option2Alpha[i]=.64+.06*summit;
  }
  option2Geometry.setAttribute('color',new THREE.BufferAttribute(option2Colors,3));
@@ -4077,19 +4091,21 @@ async function buildOption3(){
  option3Geometry.computeVertexNormals();option3Geometry.computeBoundingSphere();
  // Colour, sand texture and transparency copied from the existing +600/+700/+1000 proposals.
  const option3Positions=option3Geometry.attributes.position.array;
+ const option3Normals=option3Geometry.attributes.normal.array;
  const option3Count=option3Positions.length/3;
  const option3Colors=new Float32Array(option3Positions.length);
  const option3Alpha=new Float32Array(option3Count);
  let option3Ymax=-Infinity;
  for(let i=0;i<option3Count;i++){const y=option3Positions[3*i+1];if(y>option3Ymax)option3Ymax=y;}
- const option3SummitRGB=rampColor(SAND_STOPS_CURRENT,1).map(v=>v*.41);
+ const option3SummitRGB=rampColor(SAND_STOPS_CURRENT,1).map(v=>v*OPTION_SAND_TINT);
  for(let i=0;i<option3Count;i++){
   const y=option3Positions[3*i+1];
   const t=(y-STATS.current_zmin)/(STATS.current_zmax-STATS.current_zmin);
-  const rgb=rampColor(SAND_STOPS_CURRENT,t).map(v=>v*.41);
+  const rgb=rampColor(SAND_STOPS_CURRENT,t).map(v=>v*OPTION_SAND_TINT);
   let summit=Math.max(0,Math.min(1,(y-(option3Ymax-1.5))/1.5));
   summit=summit*summit*(3-2*summit);
   for(let c=0;c<3;c++)option3Colors[3*i+c]=rgb[c]+(option3SummitRGB[c]-rgb[c])*summit;
+  optionBenchGrey(option3Colors,i,y,option3Normals);
   option3Alpha[i]=.64+.06*summit;
  }
  option3Geometry.setAttribute('color',new THREE.BufferAttribute(option3Colors,3));
