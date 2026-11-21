@@ -4114,6 +4114,26 @@ async function buildOption3(){
  option3Mesh.renderOrder=10;
  option3Mesh.name="OP 2 MOUNTAIN TOP STAGE 2 491 to 600 16deg x 33deg";option3Mesh.castShadow=false;option3Mesh.receiveShadow=true;option3Mesh.visible=false;scene.add(option3Mesh);
  addOptionSummitBoundary(option3Mesh,optionSummitBoundaries[2],'Option 3');
+ {
+  // Summit arrow and level label, built like the +500 marker.
+  const p=option3Geometry.attributes.position;
+  let high=-Infinity;for(let i=0;i<p.count;i++)high=Math.max(high,p.getY(i));
+  let x=0,z=0,n=0;for(let i=0;i<p.count;i++)if(p.getY(i)>=high-.01){x+=p.getX(i);z+=p.getZ(i);n++;}
+  const top=new THREE.Vector3(x/n,high+200,z/n);
+  const mark=new THREE.Group();mark.name='Peak +'+Math.round(high);
+  const arrow=new THREE.ArrowHelper(new THREE.Vector3(0,-1,0),top,195,0x000000,30,20);
+  arrow.traverse(o=>{if(o.material){o.material.depthTest=false;o.material.depthWrite=false;o.material.toneMapped=false;}o.renderOrder=132;});
+  mark.add(arrow);
+  const canvas=document.createElement('canvas');canvas.width=1024;canvas.height=160;
+  const ctx=canvas.getContext('2d');ctx.direction='ltr';ctx.font='bold 70px Arial';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillStyle='#000';
+  ctx.fillText('+'+Math.round(high),512,80);
+  const tex=new THREE.CanvasTexture(canvas);tex.encoding=THREE.sRGBEncoding;
+  const label=new THREE.Sprite(new THREE.SpriteMaterial({map:tex,depthTest:false,depthWrite:false,sizeAttenuation:false}));
+  label.material.toneMapped=false;label.position.copy(top).add(new THREE.Vector3(0,35,0));
+  label.scale.copy(currentPeakText.scale);label.onBeforeRender=()=>label.scale.copy(currentPeakText.scale);
+  label.renderOrder=133;mark.add(label);
+  option3Mesh.add(mark);
+ }
 }
 function ensureOption3(){
  if(option3Mesh)return Promise.resolve();
