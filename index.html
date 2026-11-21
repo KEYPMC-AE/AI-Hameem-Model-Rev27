@@ -4176,7 +4176,7 @@ function ensureOption3(){
  if(option3Mesh)return Promise.resolve();
  if(!option3Build){
   loadingEl.style.display='block';
-  setLoadingProgress(15,'جاري تجهيز Option 3...');
+  setLoadingProgress(15,'جاري تحميل المخطط الحالي...');
   option3Build=new Promise(resolve=>setTimeout(resolve,20)).then(buildOption3).then(()=>{loadingEl.style.display='none';},error=>{loadingEl.style.display='none';option3Build=null;throw error;});
  }
  return option3Build;
