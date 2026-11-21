@@ -3911,13 +3911,14 @@ function optionBenchGrey(colors,i,height,normals){
  if(normals&&Math.abs(normals[3*i+1])<.9)return;
  optionGreyPoint(colors,i);
 }
-// Where a level has no bench of its own, its contour ring is treated as the flat top.
+// Where a level has no bench of its own, the slice at its contour ring is tinted instead.
 function optionRingGrey(colors,positions,count,path){
  const ring=path.points.map(point=>[point[0]-CX,CY-point[1]]);
  let minX=Infinity,maxX=-Infinity,minZ=Infinity,maxZ=-Infinity;
  for(const [x,z] of ring){minX=Math.min(minX,x);maxX=Math.max(maxX,x);minZ=Math.min(minZ,z);maxZ=Math.max(maxZ,z);}
  let tinted=0;
  for(let i=0;i<count;i++){
+  if(Math.abs(positions[3*i+1]-OPTION_BENCH_LEVEL)>OPTION_BENCH_BAND)continue;
   const x=positions[3*i],z=positions[3*i+2];
   if(x<minX||x>maxX||z<minZ||z>maxZ)continue;
   let inside=false;
