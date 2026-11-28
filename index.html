@@ -111,7 +111,7 @@
 /* Keep the Rev124 panel dimensions independent of selected stage labels. */
 #ui:not(.collapsed){width:295px;min-width:0;max-width:calc(100vw - 62px);overflow-x:hidden}
 #uiContent,#proposalPanel,#proposalStages,#proposalLegend,#infoBody{min-width:0;max-width:100%;box-sizing:border-box}
-#optionNameBar{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);z-index:40;padding:9px 20px;border-radius:10px;background:rgba(24,16,10,.82);border:1px solid rgba(255,220,180,.35);color:#ffeccd;font-size:17px;font-weight:600;letter-spacing:.2px;pointer-events:none;white-space:pre-line;text-align:center;max-width:min(92vw,880px);line-height:1.45}
+#optionNameBar{position:fixed;left:18px;bottom:18px;z-index:40;padding:9px 20px;border-radius:10px;background:rgba(24,16,10,.82);border:1px solid rgba(255,220,180,.35);color:#ffeccd;font-size:17px;font-weight:600;letter-spacing:.2px;pointer-events:none;white-space:pre-line;text-align:center;max-width:min(92vw,880px);line-height:1.45}
 #optionNameBar[hidden]{display:none}
 #proposalLegend{display:flex;flex-direction:column;gap:6px;align-items:stretch}
 #proposalLegend[hidden]{display:none}
@@ -165,7 +165,7 @@
 <div id="canvas-container"></div>
 <div id="optionNameBar" hidden></div>
 <section id="presentCard" class="presentationCard" aria-label="العرض التقديمي" hidden><span id="presentCount"></span><h2 id="presentTitle"></h2><p id="presentText"></p><nav><button id="presentPrev">السابق</button><button id="presentPlay">إيقاف مؤقت</button><button id="presentNext">التالي</button><button id="presentEnd">إنهاء العرض</button></nav></section>
-<div id="compareOverlay" hidden><div id="compareLine"></div><div id="compareLabels"><span>القديم · 01/08/2026</span><span>الحالي · 19/11/2026</span></div><div id="compareTools"><label for="compareRange">حرّك الفاصل</label><input id="compareRange" type="range" min="5" max="95" value="50"><button id="compareClose">إغلاق</button></div></div>
+<div id="compareOverlay" hidden><div id="compareLine"></div><div id="compareLabels"><span>القديم · 01/08/2026</span><span>الحالي · 26/11/2026</span></div><div id="compareTools"><label for="compareRange">حرّك الفاصل</label><input id="compareRange" type="range" min="5" max="95" value="50"><button id="compareClose">إغلاق</button></div></div>
 
 
 
@@ -195,7 +195,7 @@
   </div>
   <div id="uiContent">
   <div id="presentationActions"><button id="presentStart">ابدأ العرض</button><button id="presentCompare" aria-pressed="false">مقارنة بستارة</button></div><div id="modeRow">
-    <button class="modeBtn active" id="modeCurrent" data-mode="current">الحالي<br>19/11/2026</button>
+    <button class="modeBtn active" id="modeCurrent" data-mode="current">الحالي<br>26/11/2026</button>
     <button class="modeBtn" id="modeExisting" data-mode="existing">القديم<br>01/08/2026</button>
     <button class="modeBtn" id="modeDiff" data-mode="diff">أعمال الدفان المنفذة</button>
   </div>
@@ -209,6 +209,8 @@
 <details id="operationsPanel" style="margin-top:10px"><summary style="cursor:pointer">توزيع التشغيل</summary>
 <label class="chkRow"><input id="chkOperations" type="checkbox"> إظهار الخطوط كاد</label>
 <label class="chkRow"><input id="chkConveyorRealism" type="checkbox" checked> إظهار الخطوط بواقعية</label>
+<label class="chkRow"><input id="chkLineLabels" type="checkbox" checked> أسماء الخطوط وتسميات عناصرها</label>
+<label class="chkRow"><input id="chkSpreaderCallouts" type="checkbox" checked> موزّعات الرمل وأسماؤها</label>
 </details>
 <details id="equipmentPanel" style="margin-top:10px"><summary style="cursor:pointer">المعدات والحفارات (3D)</summary>
 <label class="chkRow"><input id="chkEquipAll" type="checkbox" checked> إظهار المعدات</label>
@@ -236,7 +238,7 @@
     <h3>مصدر البيانات</h3>
     <table>
       <tr><td>السرفاي القديم (Existing)</td><td>01/08/2026</td></tr>
-      <tr><td>السرفاي الحالي (Current)</td><td>19/11/2026</td></tr>
+      <tr><td>السرفاي الحالي (Current)</td><td>26/11/2026</td></tr>
     </table>
 
     <h3>المناسيب</h3>
@@ -2204,7 +2206,7 @@ const pe=id=>document.getElementById(id);
 const scenes=[
  ['المشروع من أعلى','نظرة عامة على الموقع وحدود الدفان.','current',.3,.35,1],
  ['الرفع السابق','حالة الموقع بتاريخ 01/08/2026.','existing',.65,.9,.78],
- ['الرفع الحالي','حالة الموقع بتاريخ 19/11/2026.','current',.65,.9,.78],
+ ['الرفع الحالي','حالة الموقع بتاريخ 26/11/2026.','current',.65,.9,.78],
  ['الدفان والإزالة','البني زيادة منسوب، والأزرق انخفاض منسوب. الألوان تصف الفرق بين الرفعين.','diff',.65,.9,.78],
  ['قبل وبعد','حرّك الفاصل لمقارنة السطحين من نفس الكاميرا.','compare',.65,.9,.78]
 ];
@@ -3901,7 +3903,17 @@ function addComponentSurfaceLabel(t,parent){
 }
 const componentLabelGroup=new THREE.Group();componentLabelGroup.name="Line component identifiers";conveyorNameGroup.add(componentLabelGroup);
 const koch6ComponentLabelGroup=new THREE.Group();koch6ComponentLabelGroup.name="KOCH6 component identifiers";koch6Root.add(koch6ComponentLabelGroup);
-for(const t of componentLabelData)addComponentSurfaceLabel(t,t.koch6?koch6ComponentLabelGroup:componentLabelGroup);
+const lineLabelsToggle=document.getElementById('chkLineLabels');
+function syncLineLabels(){
+ conveyorNameGroup.visible=lineLabelsToggle.checked;
+ koch6ComponentLabelGroup.visible=lineLabelsToggle.checked;
+ operationsRevision++;
+}
+lineLabelsToggle.addEventListener('change',syncLineLabels);
+for(const t of componentLabelData){
+ addComponentSurfaceLabel(t,t.koch6?koch6ComponentLabelGroup:componentLabelGroup);
+}
+syncLineLabels();
 
 const peak500ArrowPosition=summitArrow.position.clone(),peak500TextPosition=currentPeakText.position.clone();let peak600Shown=false;
 const proposalPeakMarks=new Map();
@@ -4310,7 +4322,7 @@ function addFlatPlanLabel(text,x,y,level,angle,parent,colour,textHeight){
  return label;
 }
 const PLAN_LABEL_HEIGHT=32;   // a step up from the 20 m the model's own labels use
-const PLAN_DIM_HEIGHT=46;     // the limit dimensions are read from further out
+const PLAN_DIM_HEIGHT=68;     // the limit dimensions are read from further out
 
 // 1000 m limits taken from the plan DXFs: one measured from the summit, one from the base.
 const LIMIT_PLANS=[
@@ -4319,8 +4331,6 @@ const LIMIT_PLANS=[
   dims:[{value:'2000',line:[[216658.322,2524860.4818],[216658.322,2526860.4818]],ext:[[216694.9704,2524860.4818],[216694.9704,2526860.4818]],text:[216656.421,2525860.4818],angle:90},
         {value:'1000',line:[[217784.307,2525860.4818],[217784.307,2526860.4818]],ext:[[217694.9704,2525860.4818],[217694.9704,2526860.4818]],text:[217782.406,2526360.4818],angle:90},
         {value:'1000',line:[[217784.307,2524860.4818],[217784.307,2525860.4818]],ext:[[217694.9704,2524860.4818],[217694.9704,2525860.4818]],text:[217782.406,2525360.4818],angle:90},
-        {value:'1000',line:[[216694.9704,2526920.665],[217694.9704,2526920.665]],ext:[[216694.9704,2526860.4818],[217694.9704,2526860.4818]],text:[217194.9704,2526922.566],angle:0},
-        {value:'1000',line:[[216694.9704,2524808.033],[217694.9704,2524808.033]],ext:[[216694.9704,2524860.4818],[217694.9704,2524860.4818]],text:[217194.9704,2524809.934],angle:0},
         {value:'1000',line:[[216694.9704,2525860.4818],[217694.9704,2525860.4818]],ext:[[216694.9704,2525860.4818],[217694.9704,2525860.4818]],text:[217194.9704,2525860.4818],angle:0}]},
  {id:'limitBase1000',name:'Limit 1000 m from the base',level:80,overlay:true,offsetDims:true,edgeColour:0xffffff,edgeWidth:9,drops:false,
   ring:[[217695.5954,2524064.1054],[217695.5954,2527703.734],[215487.9419,2527703.734],[215487.9419,2524064.1054]],
@@ -4384,10 +4394,20 @@ function buildLimitPlan(plan){
   const run=Math.hypot(b[0]-a[0],b[1]-a[1]);
   const ux=(b[0]-a[0])/run,uy=(b[1]-a[1])/run;
   for(let t=0;t<run;t+=dash+gap){
-   const stop=Math.min(run,t+dash),points=[];
+   let stop=Math.min(run,t+dash);
+   let start=t;
+   if(plan.id==='limitBase1000'&&k===0){
+    const gapStart=plan.dims[1].ext[1][1]-a[1],gapEnd=plan.dims[0].ext[0][1]-a[1];
+    if(start<gapEnd&&stop>gapStart){
+     if(start<gapStart)stop=gapStart;
+     else if(stop>gapEnd)start=gapEnd;
+     else continue;
+    }
+   }
+   const points=[];
    const steps=plan.drape?Math.max(1,Math.ceil((stop-t)/20)):1;
    for(let i=0;i<=steps;i++){
-    const at=t+(stop-t)*i/steps,E=a[0]+ux*at,N=a[1]+uy*at;
+    const at=start+(stop-start)*i/steps,E=a[0]+ux*at,N=a[1]+uy*at;
     points.push([E,N,height([E,N])]);
    }
    edgePaths.push({points,closed:false});
@@ -4396,10 +4416,20 @@ function buildLimitPlan(plan){
  const edge=new THREE.Mesh(backfillGeometry(edgePaths),edgeMaterial);
  edge.name=plan.name+' edge';edge.renderOrder=136;edge.frustumCulled=false;group.add(edge);
  // dimensions: measured along the rectangle's own boundary
+ const dimensions=plan.dims.filter(dim=>dim.value==='1000');
  const dimPaths=[];
- for(const dim of plan.dims){
+ const arrowVertices=[];
+ for(const dim of dimensions){
   const [a,b]=plan.offsetDims?dim.line:dim.ext;
   dimPaths.push({points:[[a[0],a[1],level],[b[0],b[1],level]],closed:false});
+  for(const [tip,other] of [[a,b],[b,a]]){
+   const length=Math.hypot(other[0]-tip[0],other[1]-tip[1]);
+   if(length<1)continue;
+   const east=(other[0]-tip[0])/length,north=(other[1]-tip[1])/length;
+   const x=tip[0]-CX,z=CY-tip[1];
+   const baseX=x+east*55,baseZ=z-north*55;
+   arrowVertices.push(x,level,z,baseX+north*20,level,baseZ+east*20,baseX-north*20,level,baseZ-east*20);
+  }
   if(plan.offsetDims)for(let k=0;k<2;k++){
    const from=dim.ext[k],to=dim.line[k],dx=to[0]-from[0],dy=to[1]-from[1];
    if(Math.hypot(dx,dy)<1)continue;
@@ -4413,10 +4443,24 @@ function buildLimitPlan(plan){
  }
  const dimLines=new THREE.Mesh(backfillGeometry(dimPaths),backfillMaterial(0x000000,5));
  dimLines.name=plan.name+' dimension lines';dimLines.renderOrder=136;dimLines.frustumCulled=false;group.add(dimLines);
- for(const dim of plan.dims){
+ const arrowGeometry=new THREE.BufferGeometry();
+ arrowGeometry.setAttribute('position',new THREE.Float32BufferAttribute(arrowVertices,3));
+ const arrows=new THREE.Mesh(arrowGeometry,new THREE.MeshBasicMaterial({
+  color:0x000000,side:THREE.DoubleSide,depthTest:false,depthWrite:false,transparent:true
+ }));
+ arrows.name=plan.name+' dimension arrowheads';arrows.renderOrder=137;group.add(arrows);
+ for(const dim of dimensions){
   const run=plan.offsetDims?dim.line:dim.ext;
   const midX=(run[0][0]+run[1][0])/2,midY=(run[0][1]+run[1][1])/2;
-  addFlatPlanLabel(dim.value+' m',midX,midY,level,dim.angle,group,null,PLAN_DIM_HEIGHT);
+  const label=addFlatPlanLabel(dim.value+' m',midX,midY,level,dim.angle,group,null,PLAN_DIM_HEIGHT);
+  const start=point(run[0]),end=point(run[1]);
+  const screenStart=new THREE.Vector3(),screenEnd=new THREE.Vector3();
+  label.onBeforeRender=(renderer,scene,camera)=>{
+   screenStart.copy(start).project(camera);
+   screenEnd.copy(end).project(camera);
+   const angle=Math.atan2(screenEnd.y-screenStart.y,(screenEnd.x-screenStart.x)*(camera.aspect||1));
+   label.material.rotation=angle>Math.PI/2?angle-Math.PI:angle<-Math.PI/2?angle+Math.PI:angle;
+  };
  }
  let enabled=false;
  const button=document.getElementById(plan.id+'Toggle');
@@ -4432,7 +4476,18 @@ for(const plan of LIMIT_PLANS)buildLimitPlan(plan);
 
 // Sand spreader called out at the north end of the KOCH 2 line.
 {
- const E=217044.1705,N=2526127.5315,x=E-CX,n=N-CY;
+ const spreaderLayer=new THREE.Group();scene.add(spreaderLayer);
+ const spreaderToggle=document.getElementById('chkSpreaderCallouts');
+ spreaderToggle.addEventListener('change',()=>{
+  spreaderLayer.visible=spreaderToggle.checked;
+  operationsRevision++;
+ });
+ for(const {line,E,N,color,offsetE,offsetN} of [
+  {line:2,E:217044.1705,N:2526127.5315,color:0x0a2a66,offsetE:0,offsetN:65},
+  {line:3,E:216689.0900618414,N:2525712.257828365,color:0x348414,offsetE:75,offsetN:-115},
+  {line:6,E:216380.294307267,N:2526755.089540635,color:0xd92127,offsetE:-105,offsetN:-115}
+ ]){
+ const x=E-CX,n=N-CY;
  let z=operationsHeight(x,n);
  if(z===null||!Number.isFinite(z)){
   const ix=Math.max(0,Math.min(NX-1,Math.round((E-XMIN)/(XMAX-XMIN)*(NX-1))));
@@ -4440,9 +4495,9 @@ for(const plan of LIMIT_PLANS)buildLimitPlan(plan);
   z=elevCurrentRaw[iy*NX+ix];
  }
  // written as it should appear on screen, so the renderer's encoding keeps it dark
- const deepBlue=new THREE.Color(0x0a2a66).convertSRGBToLinear();
- const group=new THREE.Group();group.name='موزع رمل خط رقم KOCH 2';scene.add(group);
- const ring=new THREE.Mesh(new THREE.CircleGeometry(33,64),new THREE.MeshBasicMaterial({color:deepBlue,side:THREE.DoubleSide,depthTest:false,depthWrite:false,toneMapped:false}));
+ const deepBlue=new THREE.Color(color).convertSRGBToLinear();
+ const group=new THREE.Group();group.name='موزع رمل خط رقم KOCH '+line;spreaderLayer.add(group);
+ const ring=new THREE.Mesh(new THREE.CircleGeometry(50,64),new THREE.MeshBasicMaterial({color:deepBlue,side:THREE.DoubleSide,depthTest:false,depthWrite:false,toneMapped:false}));
  ring.rotation.x=-Math.PI/2;ring.position.set(x,z+1.5,-n);ring.renderOrder=140;ring.frustumCulled=false;group.add(ring);
  const top=new THREE.Vector3(x,z+170,-n);
  const arrow=new THREE.ArrowHelper(new THREE.Vector3(0,-1,0),top,150,0x000000,28,18);
@@ -4451,14 +4506,16 @@ for(const plan of LIMIT_PLANS)buildLimitPlan(plan);
  {
   const nameCanvas=document.createElement('canvas');nameCanvas.width=1024;nameCanvas.height=160;
   const nameCtx=nameCanvas.getContext('2d');nameCtx.direction='rtl';nameCtx.font='bold 70px Arial';nameCtx.textAlign='center';nameCtx.textBaseline='middle';nameCtx.fillStyle='#000000';
-  nameCtx.fillText('موزع رمل خط رقم KOCH 2',512,80);
+  nameCtx.fillText(group.name,512,80);
   const nameTex=new THREE.CanvasTexture(nameCanvas);nameTex.encoding=THREE.sRGBEncoding;
   const name=new THREE.Sprite(new THREE.SpriteMaterial({map:nameTex,depthTest:false,depthWrite:false,sizeAttenuation:false}));
-  name.material.toneMapped=false;name.position.set(x,z+205,-n);
+  name.material.toneMapped=false;name.position.set(x+offsetE,z+240,-n-offsetN);
   name.scale.copy(currentPeakText.scale).multiplyScalar(.78);
   name.onBeforeRender=(renderer,scene,camera)=>{name.scale.copy(currentPeakText.scale).multiplyScalar(.78);name.material.rotation=callOutRotation(camera);};
   name.renderOrder=133;group.add(name);
  }
+}
+
 }
 
 const rampCadGroup=new THREE.Group();operationsGroup.add(rampCadGroup);
@@ -4501,7 +4558,7 @@ animate();
 <script src="assets/line06-data.js"></script>
 <script src="assets/koch6-data.js"></script>
 <script src="assets/road-bridges-data.js"></script>
-<script src="assets/payload.js"></script>
+<script src="assets/payload.js?v=20261126"></script>
 <script type="application/octet-stream" id="line06-data"></script><script type="application/octet-stream" id="koch6-data"></script><aside id="stageFillCards" aria-live="polite" aria-label="كمية الدفان للمراحل" hidden></aside><script type="application/octet-stream" id="road-bridges-data"></script><button id="routeVideoStopOverlay" type="button" hidden style="position:fixed;z-index:100;top:18px;right:18px;background:#7a3027;color:white;border:1px solid #e5b294;border-radius:8px;padding:12px 18px">إيقاف وحفظ الفيديو — Esc</button><script type="application/octet-stream" id="proposal-data-target600"></script><script type="application/octet-stream" id="proposal-data-target700"></script><script type="application/octet-stream" id="proposal-data-target1000"></script><script type="application/octet-stream" id="proposal-data-angle18-700"></script><script type="application/octet-stream" id="proposal-data-angle18-1000"></script><script type="application/octet-stream" id="proposal-data-angle18-600"></script></body>
 </html>
 
