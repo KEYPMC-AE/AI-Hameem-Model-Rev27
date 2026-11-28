@@ -4224,14 +4224,16 @@ function addFlatPlanLabel(text,x,y,level,angle,parent){
  const mesh=new THREE.Mesh(geometry,material);mesh.name=text;mesh.renderOrder=137;mesh.frustumCulled=false;parent.add(mesh);
  return mesh;
 }
-const PLAN_LABEL_HEIGHT=20;   // the height the model's own labels use
+const PLAN_LABEL_HEIGHT=32;   // a step up from the 20 m the model's own labels use
 
 // 1000 m limit north, south and west of the summit, taken from the plan DXF.
 const LIMIT1000={level:493.864,
  ring:[[217694.9704,2524860.4818],[217694.9704,2526860.4818],[216694.9704,2526860.4818],[216694.9704,2524860.4818]],
- dims:[{value:'2000',edge:216694.9704,line:216658.322,from:2524860.4818,to:2526860.4818,text:[216656.421,2525860.4818]},
-       {value:'1000',edge:217694.9704,line:217784.307,from:2525860.4818,to:2526860.4818,text:[217782.406,2526360.4818]},
-       {value:'1000',edge:217694.9704,line:217784.307,from:2524860.4818,to:2525860.4818,text:[217782.406,2525360.4818]}]};
+ dims:[{value:'2000',line:[[216658.322,2524860.4818],[216658.322,2526860.4818]],ext:[[216694.9704,2524860.4818],[216694.9704,2526860.4818]],text:[216656.421,2525860.4818],angle:90},
+       {value:'1000',line:[[217784.307,2525860.4818],[217784.307,2526860.4818]],ext:[[217694.9704,2525860.4818],[217694.9704,2526860.4818]],text:[217782.406,2526360.4818],angle:90},
+       {value:'1000',line:[[217784.307,2524860.4818],[217784.307,2525860.4818]],ext:[[217694.9704,2524860.4818],[217694.9704,2525860.4818]],text:[217782.406,2525360.4818],angle:90},
+       {value:'1000',line:[[216694.9704,2526920.665],[217694.9704,2526920.665]],ext:[[216694.9704,2526860.4818],[217694.9704,2526860.4818]],text:[217194.9704,2526922.566],angle:0},
+       {value:'1000',line:[[216694.9704,2524808.033],[217694.9704,2524808.033]],ext:[[216694.9704,2524860.4818],[217694.9704,2524860.4818]],text:[217194.9704,2524809.934],angle:0}]};
 const limit1000Group=new THREE.Group();limit1000Group.name='Limit 1000 m from the summit';limit1000Group.visible=false;scene.add(limit1000Group);
 {
  const level=LIMIT1000.level;
@@ -4254,12 +4256,16 @@ const limit1000Group=new THREE.Group();limit1000Group.name='Limit 1000 m from th
  const dimMaterial=backfillMaterial(0x5a321b,2);
  const dimPaths=[];
  for(const dim of LIMIT1000.dims){
-  dimPaths.push({points:[[dim.line,dim.from,level],[dim.line,dim.to,level]],closed:false});
-  for(const y of [dim.from,dim.to])dimPaths.push({points:[[dim.edge,y,level],[dim.line+(dim.line-dim.edge)*.08,y,level]],closed:false});
+  dimPaths.push({points:[[dim.line[0][0],dim.line[0][1],level],[dim.line[1][0],dim.line[1][1],level]],closed:false});
+  for(let k=0;k<2;k++){
+   const start=dim.ext[k],stop=dim.line[k];
+   const overshootX=(stop[0]-start[0])*.12,overshootY=(stop[1]-start[1])*.12;
+   dimPaths.push({points:[[start[0],start[1],level],[stop[0]+overshootX,stop[1]+overshootY,level]],closed:false});
+  }
  }
  const dimLines=new THREE.Mesh(backfillGeometry(dimPaths),dimMaterial);
  dimLines.name='Limit 1000 m dimension lines';dimLines.renderOrder=136;dimLines.frustumCulled=false;limit1000Group.add(dimLines);
- for(const dim of LIMIT1000.dims)addFlatPlanLabel(dim.value,dim.text[0],dim.text[1],level,90,limit1000Group);
+ for(const dim of LIMIT1000.dims)addFlatPlanLabel(dim.value+' m',dim.text[0],dim.text[1],level,dim.angle,limit1000Group);
 }
 let limit1000Enabled=false;
 function syncLimit1000(){const on=limit1000Enabled&&mode==='current';limit1000Group.visible=on;
