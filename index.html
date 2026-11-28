@@ -4264,7 +4264,7 @@ const LIMIT_PLANS=[
         {value:'1000',line:[[217784.307,2524860.4818],[217784.307,2525860.4818]],ext:[[217694.9704,2524860.4818],[217694.9704,2525860.4818]],text:[217782.406,2525360.4818],angle:90},
         {value:'1000',line:[[216694.9704,2526920.665],[217694.9704,2526920.665]],ext:[[216694.9704,2526860.4818],[217694.9704,2526860.4818]],text:[217194.9704,2526922.566],angle:0},
         {value:'1000',line:[[216694.9704,2524808.033],[217694.9704,2524808.033]],ext:[[216694.9704,2524860.4818],[217694.9704,2524860.4818]],text:[217194.9704,2524809.934],angle:0}]},
- {id:'limitBase1000',name:'Limit 1000 m from the base',level:80,
+ {id:'limitBase1000',name:'Limit 1000 m from the base',level:80,drape:true,edgeColour:0xffffff,edgeWidth:7,drops:false,
   ring:[[217695.5954,2524064.1054],[217695.5954,2527703.734],[215487.9419,2527703.734],[215487.9419,2524064.1054]],
   dims:[{value:'1000',line:[[217933.775,2526703.734],[217933.775,2527703.734]],ext:[[217695.383,2526703.734],[217694.97,2527703.734]],text:[217931.874,2527203.734],angle:90},
         {value:'1000',line:[[217935.025,2524064.105],[217935.025,2525064.105]],ext:[[217694.97,2524064.105],[217694.97,2525064.105]],text:[217933.124,2524564.105],angle:90},
@@ -4277,22 +4277,6 @@ const limitGrey=(()=>{const c=new Float32Array(3);const base=rampColor(SAND_STOP
 function buildLimitPlan(plan){
  const level=plan.level;
  const group=new THREE.Group();group.name=plan.name;group.visible=false;scene.add(group);
- const point=([x,y])=>new THREE.Vector3(x-CX,level,CY-y);
- // shaded face, kept see-through so the model stays readable underneath
- const corners=plan.ring.map(point);
- const faceGeometry=new THREE.BufferGeometry();
- faceGeometry.setAttribute('position',new THREE.Float32BufferAttribute([
-  ...corners[0].toArray(),...corners[1].toArray(),...corners[2].toArray(),
-  ...corners[0].toArray(),...corners[2].toArray(),...corners[3].toArray()],3));
- faceGeometry.computeVertexNormals();faceGeometry.computeBoundingSphere();
- const face=new THREE.Mesh(faceGeometry,new THREE.MeshBasicMaterial({color:limitGrey,transparent:true,opacity:.55,side:THREE.DoubleSide,depthWrite:false,polygonOffset:true,polygonOffsetFactor:-2,polygonOffsetUnits:-2}));
- face.name=plan.name+' shading';face.renderOrder=28;group.add(face);
- // brown edge, drawn like the other boundary outlines
- const edgeMaterial=backfillMaterial(0x5a321b,3);
- edgeMaterial.fragmentShader=edgeMaterial.fragmentShader.replace('opacity*0.55','opacity*0.95');
- const edge=new THREE.Mesh(backfillGeometry([{points:plan.ring.map(([x,y])=>[x,y,level]),closed:true}]),edgeMaterial);
- edge.name=plan.name+' edge';edge.renderOrder=136;edge.frustumCulled=false;group.add(edge);
- // dimensions: measured along the rectangle's own boundary, with a line down to the ground at each end
  const ground=(E,N)=>{
   let z=operationsHeight(E-CX,N-CY);
   if(z===null||!Number.isFinite(z)){
@@ -4302,10 +4286,53 @@ function buildLimitPlan(plan){
   }
   return z+.6;
  };
+ const height=([E,N])=>plan.drape?ground(E,N):level;
+ const point=q=>new THREE.Vector3(q[0]-CX,height(q),CY-q[1]);
+ // shaded face, kept see-through so the model stays readable underneath
+ const corners=plan.ring.map(point);
+ const faceGeometry=new THREE.BufferGeometry();
+ if(plan.drape){
+  // follow the ground across the whole area
+  const span=(a,b)=>Math.max(2,Math.min(260,Math.ceil(Math.hypot(b[0]-a[0],b[1]-a[1])/20)));
+  const nu=span(plan.ring[0],plan.ring[1]),nv=span(plan.ring[1],plan.ring[2]);
+  const positions=[],indices=[];
+  for(let j=0;j<=nv;j++)for(let i=0;i<=nu;i++){
+   const u=i/nu,v=j/nv;
+   const E=(1-v)*((1-u)*plan.ring[0][0]+u*plan.ring[1][0])+v*((1-u)*plan.ring[3][0]+u*plan.ring[2][0]);
+   const N=(1-v)*((1-u)*plan.ring[0][1]+u*plan.ring[1][1])+v*((1-u)*plan.ring[3][1]+u*plan.ring[2][1]);
+   positions.push(E-CX,ground(E,N),CY-N);
+  }
+  for(let j=0;j<nv;j++)for(let i=0;i<nu;i++){
+   const a=j*(nu+1)+i,b=a+1,c=a+nu+1,e=c+1;
+   indices.push(a,c,b,b,c,e);
+  }
+  faceGeometry.setAttribute('position',new THREE.Float32BufferAttribute(positions,3));
+  faceGeometry.setIndex(indices);
+ }else{
+  faceGeometry.setAttribute('position',new THREE.Float32BufferAttribute([
+   ...corners[0].toArray(),...corners[1].toArray(),...corners[2].toArray(),
+   ...corners[0].toArray(),...corners[2].toArray(),...corners[3].toArray()],3));
+ }
+ faceGeometry.computeVertexNormals();faceGeometry.computeBoundingSphere();
+ const face=new THREE.Mesh(faceGeometry,new THREE.MeshBasicMaterial({color:limitGrey,transparent:true,opacity:.55,side:THREE.DoubleSide,depthWrite:false,polygonOffset:true,polygonOffsetFactor:-2,polygonOffsetUnits:-2}));
+ face.name=plan.name+' shading';face.renderOrder=28;group.add(face);
+ // brown edge, drawn like the other boundary outlines
+ const edgeMaterial=backfillMaterial(plan.edgeColour??0x5a321b,plan.edgeWidth??3);
+ edgeMaterial.fragmentShader=edgeMaterial.fragmentShader.replace('opacity*0.55','opacity*0.95');
+ const edgeRing=[];
+ for(let k=0;k<plan.ring.length;k++){
+  const a=plan.ring[k],b=plan.ring[(k+1)%plan.ring.length];
+  const steps=plan.drape?Math.max(1,Math.ceil(Math.hypot(b[0]-a[0],b[1]-a[1])/20)):1;
+  for(let i=0;i<steps;i++){const f=i/steps,E=a[0]+(b[0]-a[0])*f,N=a[1]+(b[1]-a[1])*f;edgeRing.push([E,N,height([E,N])]);}
+ }
+ const edge=new THREE.Mesh(backfillGeometry([{points:edgeRing,closed:true}]),edgeMaterial);
+ edge.name=plan.name+' edge';edge.renderOrder=136;edge.frustumCulled=false;group.add(edge);
+ // dimensions: measured along the rectangle's own boundary
  const dimPaths=[];
  for(const dim of plan.dims){
   const [a,b]=dim.ext;
   dimPaths.push({points:[[a[0],a[1],level],[b[0],b[1],level]],closed:false});
+  if(plan.drops===false)continue;
   const dx=b[0]-a[0],dy=b[1]-a[1],span=Math.hypot(dx,dy)||1;
   // the sliver of lean keeps a vertical segment drawable
   const ux=dx/span*.05,uy=dy/span*.05;
