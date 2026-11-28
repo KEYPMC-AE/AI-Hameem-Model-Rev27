@@ -4290,8 +4290,25 @@ function buildLimitPlan(plan){
  edgeMaterial.fragmentShader=edgeMaterial.fragmentShader.replace('opacity*0.55','opacity*0.95');
  const edge=new THREE.Mesh(backfillGeometry([{points:plan.ring.map(([x,y])=>[x,y,level]),closed:true}]),edgeMaterial);
  edge.name=plan.name+' edge';edge.renderOrder=136;edge.frustumCulled=false;group.add(edge);
- // dimensions: each one measured along the rectangle's own boundary, no witness arms
- const dimPaths=plan.dims.map(dim=>({points:[[dim.ext[0][0],dim.ext[0][1],level],[dim.ext[1][0],dim.ext[1][1],level]],closed:false}));
+ // dimensions: measured along the rectangle's own boundary, with a line down to the ground at each end
+ const ground=(E,N)=>{
+  let z=operationsHeight(E-CX,N-CY);
+  if(z===null||!Number.isFinite(z)){
+   const ix=Math.max(0,Math.min(NX-1,Math.round((E-XMIN)/(XMAX-XMIN)*(NX-1))));
+   const iy=Math.max(0,Math.min(NY-1,Math.round((N-YMIN)/(YMAX-YMIN)*(NY-1))));
+   z=elevCurrentRaw[iy*NX+ix];
+  }
+  return z+.6;
+ };
+ const dimPaths=[];
+ for(const dim of plan.dims){
+  const [a,b]=dim.ext;
+  dimPaths.push({points:[[a[0],a[1],level],[b[0],b[1],level]],closed:false});
+  const dx=b[0]-a[0],dy=b[1]-a[1],span=Math.hypot(dx,dy)||1;
+  // the sliver of lean keeps a vertical segment drawable
+  const ux=dx/span*.05,uy=dy/span*.05;
+  for(const end of [a,b])dimPaths.push({points:[[end[0],end[1],level],[end[0]+ux,end[1]+uy,ground(end[0],end[1])]],closed:false});
+ }
  const dimLines=new THREE.Mesh(backfillGeometry(dimPaths),backfillMaterial(0x000000,5));
  dimLines.name=plan.name+' dimension lines';dimLines.renderOrder=136;dimLines.frustumCulled=false;group.add(dimLines);
  for(const dim of plan.dims){
