@@ -4337,15 +4337,16 @@ for(const plan of LIMIT_PLANS)buildLimitPlan(plan);
   const iy=Math.max(0,Math.min(NY-1,Math.round((N-YMIN)/(YMAX-YMIN)*(NY-1))));
   z=elevCurrentRaw[iy*NX+ix];
  }
- const blue=0x1565c0;
- const group=new THREE.Group();group.name='موزع رمل خط رقم 2';scene.add(group);
- const ring=new THREE.Mesh(new THREE.RingGeometry(26,33,64),new THREE.MeshBasicMaterial({color:blue,transparent:true,opacity:.95,side:THREE.DoubleSide,depthTest:false,depthWrite:false,toneMapped:false}));
+ // written as it should appear on screen, so the renderer's encoding keeps it dark
+ const deepBlue=new THREE.Color(0x0a2a66).convertSRGBToLinear();
+ const group=new THREE.Group();group.name='موزع رمل خط رقم KOCH 2';scene.add(group);
+ const ring=new THREE.Mesh(new THREE.CircleGeometry(33,64),new THREE.MeshBasicMaterial({color:deepBlue,side:THREE.DoubleSide,depthTest:false,depthWrite:false,toneMapped:false}));
  ring.rotation.x=-Math.PI/2;ring.position.set(x,z+1.5,-n);ring.renderOrder=140;ring.frustumCulled=false;group.add(ring);
  const top=new THREE.Vector3(x,z+170,-n);
- const arrow=new THREE.ArrowHelper(new THREE.Vector3(0,-1,0),top,150,blue,28,18);
+ const arrow=new THREE.ArrowHelper(new THREE.Vector3(0,-1,0),top,150,0x000000,28,18);
  arrow.traverse(o=>{if(o.material){o.material.depthTest=false;o.material.depthWrite=false;o.material.toneMapped=false;}o.renderOrder=141;});
  group.add(arrow);
- addFlatPlanLabel('موزع رمل خط رقم 2',E,N,z+175,0,group,'#1565c0');
+ addFlatPlanLabel('موزع رمل خط رقم KOCH 2',E,N,z+175,0,group,'#000');
 }
 
 const rampCadGroup=new THREE.Group();operationsGroup.add(rampCadGroup);
