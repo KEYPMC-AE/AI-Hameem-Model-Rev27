@@ -2509,6 +2509,14 @@ const arrowTop=currentPeakPoint.clone().add(new THREE.Vector3(0,200,0));
 const summitArrow=new THREE.ArrowHelper(new THREE.Vector3(0,-1,0),arrowTop,195,0x000000,30,20);summitArrow.traverse(o=>{if(o.material){o.material.depthTest=false;o.material.depthWrite=false;o.material.toneMapped=false;}o.renderOrder=132;});currentPeakMark.add(summitArrow);
 const peakCanvas=document.createElement('canvas');peakCanvas.width=1024;peakCanvas.height=160;const peakCtx=peakCanvas.getContext('2d');peakCtx.direction='ltr';peakCtx.font='bold 70px Arial';peakCtx.textAlign='center';peakCtx.textBaseline='middle';peakCtx.lineWidth=10;peakCtx.strokeStyle='#fff8e8';peakCtx.fillStyle='#000000';peakCtx.fillText('+500',512,80);
 const peakTex=new THREE.CanvasTexture(peakCanvas);peakTex.encoding=THREE.sRGBEncoding;const currentPeakText=new THREE.Sprite(new THREE.SpriteMaterial({map:peakTex,depthTest:false,depthWrite:false,sizeAttenuation:false}));currentPeakText.material.toneMapped=false;currentPeakText.position.copy(arrowTop).add(new THREE.Vector3(0,35,0));currentPeakText.scale.set(.23,.036,1);currentPeakText.renderOrder=133;currentPeakMark.add(currentPeakText);
+// The same label style as +500, naming what the arrow points at.
+const summitPlaceCanvas=document.createElement('canvas');summitPlaceCanvas.width=1024;summitPlaceCanvas.height=160;
+const summitPlaceCtx=summitPlaceCanvas.getContext('2d');summitPlaceCtx.direction='rtl';summitPlaceCtx.font='bold 70px Arial';summitPlaceCtx.textAlign='center';summitPlaceCtx.textBaseline='middle';summitPlaceCtx.fillStyle='#000000';summitPlaceCtx.fillText('موقع القمة',512,80);
+const summitPlaceTex=new THREE.CanvasTexture(summitPlaceCanvas);summitPlaceTex.encoding=THREE.sRGBEncoding;
+const summitPlaceText=new THREE.Sprite(new THREE.SpriteMaterial({map:summitPlaceTex,depthTest:false,depthWrite:false,sizeAttenuation:false}));
+summitPlaceText.material.toneMapped=false;summitPlaceText.position.copy(currentPeakText.position).add(new THREE.Vector3(0,40,0));
+summitPlaceText.scale.copy(currentPeakText.scale);summitPlaceText.onBeforeRender=()=>summitPlaceText.scale.copy(currentPeakText.scale);
+summitPlaceText.renderOrder=133;currentPeakMark.add(summitPlaceText);
 
 
 function unpackModelAsset(buffer){
@@ -3861,8 +3869,8 @@ const proposalPeakMarks=new Map();
 function syncPlus600Peak(){
  const active=[...plus600Active].filter(k=>plus600Specs[k].p!==6&&plus600Cache.has(k));
  const showing=mode==='current'&&active.length>0;
- summitArrow.visible=!showing;currentPeakText.visible=!showing;summitPatch.visible=!showing;
- summitArrow.position.copy(peak500ArrowPosition);currentPeakText.position.copy(peak500TextPosition);
+ summitArrow.visible=!showing;currentPeakText.visible=!showing;summitPatch.visible=!showing;summitPlaceText.visible=!showing;
+ summitArrow.position.copy(peak500ArrowPosition);currentPeakText.position.copy(peak500TextPosition);summitPlaceText.position.copy(peak500TextPosition).add(new THREE.Vector3(0,40,0));
  if(peak600Shown!=='+500'){peakCtx.clearRect(0,0,peakCanvas.width,peakCanvas.height);peakCtx.fillText('+500',512,80);peakTex.needsUpdate=true;peak600Shown='+500';}
  for(const [k,g] of proposalPeakMarks)g.visible=mode==='current'&&active.includes(k);
  for(const k of active){if(proposalPeakMarks.has(k))continue;
@@ -4380,7 +4388,16 @@ for(const plan of LIMIT_PLANS)buildLimitPlan(plan);
  const arrow=new THREE.ArrowHelper(new THREE.Vector3(0,-1,0),top,150,0x000000,28,18);
  arrow.traverse(o=>{if(o.material){o.material.depthTest=false;o.material.depthWrite=false;o.material.toneMapped=false;}o.renderOrder=141;});
  group.add(arrow);
- addFlatPlanLabel('موزع رمل خط رقم KOCH 2',E,N,z+175,0,group,'#000');
+ {
+  const nameCanvas=document.createElement('canvas');nameCanvas.width=1024;nameCanvas.height=160;
+  const nameCtx=nameCanvas.getContext('2d');nameCtx.direction='rtl';nameCtx.font='bold 70px Arial';nameCtx.textAlign='center';nameCtx.textBaseline='middle';nameCtx.fillStyle='#000000';
+  nameCtx.fillText('موزع رمل خط رقم KOCH 2',512,80);
+  const nameTex=new THREE.CanvasTexture(nameCanvas);nameTex.encoding=THREE.sRGBEncoding;
+  const name=new THREE.Sprite(new THREE.SpriteMaterial({map:nameTex,depthTest:false,depthWrite:false,sizeAttenuation:false}));
+  name.material.toneMapped=false;name.position.set(x,z+205,-n);
+  name.scale.copy(currentPeakText.scale);name.onBeforeRender=()=>name.scale.copy(currentPeakText.scale);
+  name.renderOrder=133;group.add(name);
+ }
 }
 
 const rampCadGroup=new THREE.Group();operationsGroup.add(rampCadGroup);
