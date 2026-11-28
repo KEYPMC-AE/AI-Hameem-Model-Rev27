@@ -4205,7 +4205,7 @@ function addOptionSummitBoundary(parent,path,name){
 
 
 function addFlatPlanLabel(text,x,y,level,angle,parent){
- // Same canvas text as the model's own labels, kept flat at the given level.
+ // The model's own canvas text, kept upright and turned towards the camera.
  const canvas=document.createElement('canvas'),ctx=canvas.getContext('2d');
  const font='160px Calibri, Arial, sans-serif';ctx.font=font;
  const measure=ctx.measureText(text),asc=measure.actualBoundingBoxAscent||116,desc=measure.actualBoundingBoxDescent||0,pad=8;
@@ -4213,16 +4213,12 @@ function addFlatPlanLabel(text,x,y,level,angle,parent){
  ctx.font=font;ctx.textBaseline='alphabetic';ctx.fillStyle='#000';ctx.fillText(text,pad,pad+asc);
  const units=PLAN_LABEL_HEIGHT/asc,w=canvas.width*units,h=canvas.height*units;
  const texture=new THREE.CanvasTexture(canvas);texture.anisotropy=Math.min(8,renderer.capabilities.getMaxAnisotropy());
- const geometry=new THREE.PlaneGeometry(w,h),position=geometry.attributes.position;
- const radians=angle*Math.PI/180,cs=Math.cos(radians),sn=Math.sin(radians);
- for(let i=0;i<position.count;i++){
-  const u=position.getX(i),v=position.getY(i);
-  position.setXYZ(i,x+cs*u-sn*v-CX,level+.3,CY-(y+sn*u+cs*v));
- }
- geometry.computeBoundingSphere();
- const material=new THREE.MeshBasicMaterial({map:texture,color:0x000000,transparent:true,side:THREE.DoubleSide,depthWrite:false,depthTest:false});
- const mesh=new THREE.Mesh(geometry,material);mesh.name=text;mesh.renderOrder=137;mesh.frustumCulled=false;parent.add(mesh);
- return mesh;
+ const label=new THREE.Sprite(new THREE.SpriteMaterial({map:texture,transparent:true,depthTest:false,depthWrite:false,sizeAttenuation:true}));
+ label.material.toneMapped=false;
+ label.position.set(x-CX,level+h*.6,CY-y);
+ label.scale.set(w,h,1);
+ label.name=text;label.renderOrder=137;label.frustumCulled=false;parent.add(label);
+ return label;
 }
 const PLAN_LABEL_HEIGHT=32;   // a step up from the 20 m the model's own labels use
 
@@ -4253,7 +4249,7 @@ const limit1000Group=new THREE.Group();limit1000Group.name='Limit 1000 m from th
  const edge=new THREE.Mesh(backfillGeometry([{points:LIMIT1000.ring.map(([x,y])=>[x,y,level]),closed:true}]),edgeMaterial);
  edge.name='Limit 1000 m edge';edge.renderOrder=136;edge.frustumCulled=false;limit1000Group.add(edge);
  // dimensions, as placed in the plan
- const dimMaterial=backfillMaterial(0x5a321b,2);
+ const dimMaterial=backfillMaterial(0x000000,5);
  const dimPaths=[];
  for(const dim of LIMIT1000.dims){
   dimPaths.push({points:[[dim.line[0][0],dim.line[0][1],level],[dim.line[1][0],dim.line[1][1],level]],closed:false});
