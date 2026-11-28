@@ -4235,13 +4235,15 @@ function addOptionSummitBoundary(parent,path,name){
 
 
 
-function addFlatPlanLabel(text,x,y,level,angle,parent){
+function addFlatPlanLabel(text,x,y,level,angle,parent,colour){
  // The model's own canvas text, kept upright and turned towards the camera.
  const canvas=document.createElement('canvas'),ctx=canvas.getContext('2d');
- const font='160px Calibri, Arial, sans-serif';ctx.font=font;
+ const font='160px Calibri, Arial, sans-serif',rtl=/[؀-ۿ]/.test(text);
+ ctx.font=font;ctx.direction=rtl?'rtl':'ltr';
  const measure=ctx.measureText(text),asc=measure.actualBoundingBoxAscent||116,desc=measure.actualBoundingBoxDescent||0,pad=8;
  canvas.width=Math.ceil(measure.width+pad*2);canvas.height=Math.ceil(asc+desc+pad*2);
- ctx.font=font;ctx.textBaseline='alphabetic';ctx.fillStyle='#000';ctx.fillText(text,pad,pad+asc);
+ ctx.font=font;ctx.direction=rtl?'rtl':'ltr';ctx.textAlign=rtl?'right':'left';
+ ctx.textBaseline='alphabetic';ctx.fillStyle=colour||'#000';ctx.fillText(text,rtl?canvas.width-pad:pad,pad+asc);
  const units=PLAN_LABEL_HEIGHT/asc,w=canvas.width*units,h=canvas.height*units;
  const texture=new THREE.CanvasTexture(canvas);texture.anisotropy=Math.min(8,renderer.capabilities.getMaxAnisotropy());
  const label=new THREE.Sprite(new THREE.SpriteMaterial({map:texture,transparent:true,depthTest:false,depthWrite:false,sizeAttenuation:true}));
@@ -4325,6 +4327,26 @@ function buildLimitPlan(plan){
  return group;
 }
 for(const plan of LIMIT_PLANS)buildLimitPlan(plan);
+
+// Sand spreader called out at the north end of the KOCH 2 line.
+{
+ const E=217044.1705,N=2526127.5315,x=E-CX,n=N-CY;
+ let z=operationsHeight(x,n);
+ if(z===null||!Number.isFinite(z)){
+  const ix=Math.max(0,Math.min(NX-1,Math.round((E-XMIN)/(XMAX-XMIN)*(NX-1))));
+  const iy=Math.max(0,Math.min(NY-1,Math.round((N-YMIN)/(YMAX-YMIN)*(NY-1))));
+  z=elevCurrentRaw[iy*NX+ix];
+ }
+ const blue=0x1565c0;
+ const group=new THREE.Group();group.name='موزع رمل خط رقم 2';scene.add(group);
+ const ring=new THREE.Mesh(new THREE.RingGeometry(26,33,64),new THREE.MeshBasicMaterial({color:blue,transparent:true,opacity:.95,side:THREE.DoubleSide,depthTest:false,depthWrite:false,toneMapped:false}));
+ ring.rotation.x=-Math.PI/2;ring.position.set(x,z+1.5,-n);ring.renderOrder=140;ring.frustumCulled=false;group.add(ring);
+ const top=new THREE.Vector3(x,z+170,-n);
+ const arrow=new THREE.ArrowHelper(new THREE.Vector3(0,-1,0),top,150,blue,28,18);
+ arrow.traverse(o=>{if(o.material){o.material.depthTest=false;o.material.depthWrite=false;o.material.toneMapped=false;}o.renderOrder=141;});
+ group.add(arrow);
+ addFlatPlanLabel('موزع رمل خط رقم 2',E,N,z+175,0,group,'#1565c0');
+}
 
 const rampCadGroup=new THREE.Group();operationsGroup.add(rampCadGroup);
 for(const r of conveyorConfig.routes.filter(r=>r.userData?.rampAligned)){
