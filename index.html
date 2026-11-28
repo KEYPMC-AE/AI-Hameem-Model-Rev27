@@ -4290,14 +4290,26 @@ function buildLimitPlan(plan){
  edgeMaterial.fragmentShader=edgeMaterial.fragmentShader.replace('opacity*0.55','opacity*0.95');
  const edge=new THREE.Mesh(backfillGeometry([{points:plan.ring.map(([x,y])=>[x,y,level]),closed:true}]),edgeMaterial);
  edge.name=plan.name+' edge';edge.renderOrder=136;edge.frustumCulled=false;group.add(edge);
- // dimensions, as placed in the plan
+ // dimensions: drawn on the ground, tied up to the rectangle by vertical leaders
+ const ground=(E,N)=>{
+  let z=operationsHeight(E-CX,N-CY);
+  if(z===null||!Number.isFinite(z)){
+   const ix=Math.max(0,Math.min(NX-1,Math.round((E-XMIN)/(XMAX-XMIN)*(NX-1))));
+   const iy=Math.max(0,Math.min(NY-1,Math.round((N-YMIN)/(YMAX-YMIN)*(NY-1))));
+   z=elevCurrentRaw[iy*NX+ix];
+  }
+  return z+.6;
+ };
  const dimPaths=[];
  for(const dim of plan.dims){
   dimPaths.push({points:[[dim.line[0][0],dim.line[0][1],level],[dim.line[1][0],dim.line[1][1],level]],closed:false});
   for(let k=0;k<2;k++){
    const start=dim.ext[k],stop=dim.line[k];
-   const dx=stop[0]-start[0],dy=stop[1]-start[1];
-   if(Math.hypot(dx,dy)<1)continue;
+   const dx=stop[0]-start[0],dy=stop[1]-start[1],span=Math.hypot(dx,dy);
+   // witness line carried down from the boundary point to the ground
+   const ux=span>1?dx/span:1,uy=span>1?dy/span:0;
+   dimPaths.push({points:[[start[0],start[1],level],[start[0]+ux*.05,start[1]+uy*.05,ground(start[0],start[1])]],closed:false});
+   if(span<1)continue;
    dimPaths.push({points:[[start[0],start[1],level],[stop[0]+dx*.12,stop[1]+dy*.12,level]],closed:false});
   }
  }
