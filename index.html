@@ -4264,7 +4264,7 @@ const LIMIT_PLANS=[
         {value:'1000',line:[[217784.307,2524860.4818],[217784.307,2525860.4818]],ext:[[217694.9704,2524860.4818],[217694.9704,2525860.4818]],text:[217782.406,2525360.4818],angle:90},
         {value:'1000',line:[[216694.9704,2526920.665],[217694.9704,2526920.665]],ext:[[216694.9704,2526860.4818],[217694.9704,2526860.4818]],text:[217194.9704,2526922.566],angle:0},
         {value:'1000',line:[[216694.9704,2524808.033],[217694.9704,2524808.033]],ext:[[216694.9704,2524860.4818],[217694.9704,2524860.4818]],text:[217194.9704,2524809.934],angle:0}]},
- {id:'limitBase1000',name:'Limit 1000 m from the base',level:80,drape:true,edgeColour:0xffffff,edgeWidth:7,drops:false,
+ {id:'limitBase1000',name:'Limit 1000 m from the base',level:80,drape:true,ceiling:150,offsetDims:true,edgeColour:0xffffff,edgeWidth:7,drops:false,
   ring:[[217695.5954,2524064.1054],[217695.5954,2527703.734],[215487.9419,2527703.734],[215487.9419,2524064.1054]],
   dims:[{value:'1000',line:[[217933.775,2526703.734],[217933.775,2527703.734]],ext:[[217695.383,2526703.734],[217694.97,2527703.734]],text:[217931.874,2527203.734],angle:90},
         {value:'1000',line:[[217935.025,2524064.105],[217935.025,2525064.105]],ext:[[217694.97,2524064.105],[217694.97,2525064.105]],text:[217933.124,2524564.105],angle:90},
@@ -4284,7 +4284,7 @@ function buildLimitPlan(plan){
    const iy=Math.max(0,Math.min(NY-1,Math.round((N-YMIN)/(YMAX-YMIN)*(NY-1))));
    z=elevCurrentRaw[iy*NX+ix];
   }
-  return z+.6;
+  return Math.min(z+.6,plan.ceiling??Infinity);
  };
  const height=([E,N])=>plan.drape?ground(E,N):level;
  const point=q=>new THREE.Vector3(q[0]-CX,height(q),CY-q[1]);
@@ -4330,8 +4330,13 @@ function buildLimitPlan(plan){
  // dimensions: measured along the rectangle's own boundary
  const dimPaths=[];
  for(const dim of plan.dims){
-  const [a,b]=dim.ext;
+  const [a,b]=plan.offsetDims?dim.line:dim.ext;
   dimPaths.push({points:[[a[0],a[1],level],[b[0],b[1],level]],closed:false});
+  if(plan.offsetDims)for(let k=0;k<2;k++){
+   const from=dim.ext[k],to=dim.line[k],dx=to[0]-from[0],dy=to[1]-from[1];
+   if(Math.hypot(dx,dy)<1)continue;
+   dimPaths.push({points:[[from[0],from[1],level],[to[0]+dx*.12,to[1]+dy*.12,level]],closed:false});
+  }
   if(plan.drops===false)continue;
   const dx=b[0]-a[0],dy=b[1]-a[1],span=Math.hypot(dx,dy)||1;
   // the sliver of lean keeps a vertical segment drawable
@@ -4341,7 +4346,8 @@ function buildLimitPlan(plan){
  const dimLines=new THREE.Mesh(backfillGeometry(dimPaths),backfillMaterial(0x000000,5));
  dimLines.name=plan.name+' dimension lines';dimLines.renderOrder=136;dimLines.frustumCulled=false;group.add(dimLines);
  for(const dim of plan.dims){
-  const midX=(dim.ext[0][0]+dim.ext[1][0])/2,midY=(dim.ext[0][1]+dim.ext[1][1])/2;
+  const run=plan.offsetDims?dim.line:dim.ext;
+  const midX=(run[0][0]+run[1][0])/2,midY=(run[0][1]+run[1][1])/2;
   addFlatPlanLabel(dim.value+' m',midX,midY,level,dim.angle,group);
  }
  let enabled=false;
