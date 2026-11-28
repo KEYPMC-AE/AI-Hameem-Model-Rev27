@@ -4235,7 +4235,7 @@ function addOptionSummitBoundary(parent,path,name){
 
 
 
-function addFlatPlanLabel(text,x,y,level,angle,parent,colour){
+function addFlatPlanLabel(text,x,y,level,angle,parent,colour,textHeight){
  // The model's own canvas text, kept upright and turned towards the camera.
  const canvas=document.createElement('canvas'),ctx=canvas.getContext('2d');
  const font='160px Calibri, Arial, sans-serif',rtl=/[؀-ۿ]/.test(text);
@@ -4244,7 +4244,7 @@ function addFlatPlanLabel(text,x,y,level,angle,parent,colour){
  canvas.width=Math.ceil(measure.width+pad*2);canvas.height=Math.ceil(asc+desc+pad*2);
  ctx.font=font;ctx.direction=rtl?'rtl':'ltr';ctx.textAlign=rtl?'right':'left';
  ctx.textBaseline='alphabetic';ctx.fillStyle=colour||'#000';ctx.fillText(text,rtl?canvas.width-pad:pad,pad+asc);
- const units=PLAN_LABEL_HEIGHT/asc,w=canvas.width*units,h=canvas.height*units;
+ const units=(textHeight||PLAN_LABEL_HEIGHT)/asc,w=canvas.width*units,h=canvas.height*units;
  const texture=new THREE.CanvasTexture(canvas);texture.anisotropy=Math.min(8,renderer.capabilities.getMaxAnisotropy());
  const label=new THREE.Sprite(new THREE.SpriteMaterial({map:texture,transparent:true,depthTest:false,depthWrite:false,sizeAttenuation:true}));
  label.material.toneMapped=false;
@@ -4254,6 +4254,7 @@ function addFlatPlanLabel(text,x,y,level,angle,parent,colour){
  return label;
 }
 const PLAN_LABEL_HEIGHT=32;   // a step up from the 20 m the model's own labels use
+const PLAN_DIM_HEIGHT=46;     // the limit dimensions are read from further out
 
 // 1000 m limits taken from the plan DXFs: one measured from the summit, one from the base.
 const LIMIT_PLANS=[
@@ -4348,7 +4349,7 @@ function buildLimitPlan(plan){
  for(const dim of plan.dims){
   const run=plan.offsetDims?dim.line:dim.ext;
   const midX=(run[0][0]+run[1][0])/2,midY=(run[0][1]+run[1][1])/2;
-  addFlatPlanLabel(dim.value+' m',midX,midY,level,dim.angle,group);
+  addFlatPlanLabel(dim.value+' m',midX,midY,level,dim.angle,group,null,PLAN_DIM_HEIGHT);
  }
  let enabled=false;
  const button=document.getElementById(plan.id+'Toggle');
