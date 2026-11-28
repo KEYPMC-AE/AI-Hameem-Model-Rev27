@@ -111,7 +111,7 @@
 /* Keep the Rev124 panel dimensions independent of selected stage labels. */
 #ui:not(.collapsed){width:295px;min-width:0;max-width:calc(100vw - 62px);overflow-x:hidden}
 #uiContent,#proposalPanel,#proposalStages,#proposalLegend,#infoBody{min-width:0;max-width:100%;box-sizing:border-box}
-#optionNameBar{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);z-index:40;padding:9px 20px;border-radius:10px;background:rgba(24,16,10,.82);border:1px solid rgba(255,220,180,.35);color:#ffeccd;font-size:17px;font-weight:600;letter-spacing:.2px;pointer-events:none;white-space:nowrap}
+#optionNameBar{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);z-index:40;padding:9px 20px;border-radius:10px;background:rgba(24,16,10,.82);border:1px solid rgba(255,220,180,.35);color:#ffeccd;font-size:17px;font-weight:600;letter-spacing:.2px;pointer-events:none;white-space:pre-line;text-align:center;max-width:min(92vw,880px);line-height:1.45}
 #optionNameBar[hidden]{display:none}
 #proposalLegend{display:flex;flex-direction:column;gap:6px;align-items:stretch}
 #proposalLegend[hidden]{display:none}
@@ -3957,7 +3957,7 @@ function updateOptionNameBar(){
  const bar=document.getElementById('optionNameBar');
  if(!bar)return;
  const names=[...optionNameState].filter(([,on])=>on).map(([name])=>name);
- bar.textContent=names.join('  ·  ');
+ bar.textContent=names.join('\n');
  bar.hidden=!names.length;
 }
 // Shared colouring for the three 300x300 top options.
@@ -4396,6 +4396,7 @@ function buildLimitPlan(plan){
  const button=document.getElementById(plan.id+'Toggle');
  const sync=()=>{const on=enabled&&mode==='current';group.visible=on;
   button.setAttribute('aria-pressed',String(on));button.classList.toggle('active',on);
+  optionNameState.set(button.textContent.trim(),on);updateOptionNameBar();
   operationsRevision++;renderer.shadowMap.needsUpdate=true;};
  button.addEventListener('click',()=>{enabled=!enabled;sync();});
  const previousApplyMode=applyMode;applyMode=function(){previousApplyMode();sync();};
