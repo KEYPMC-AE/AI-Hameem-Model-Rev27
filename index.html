@@ -2330,6 +2330,32 @@ pe('saveView').onclick=async()=>{
    const url=URL.createObjectURL(new Blob([new XMLSerializer().serializeToString(svg)],{type:'image/svg+xml'}));
    try{const img=new Image();await new Promise((resolve,reject)=>{img.onload=resolve;img.onerror=reject;img.src=url;});const r=compass.getBoundingClientRect(),x=(r.left-bounds.left)*sx,y=(r.top-bounds.top)*sy,w=r.width*sx,h=r.height*sy;ctx.fillStyle='#f5efde';ctx.beginPath();ctx.ellipse(x+w/2,y+h/2,w/2,h/2,0,0,Math.PI*2);ctx.fill();ctx.drawImage(img,x,y,w,h);}finally{URL.revokeObjectURL(url);}
   }
+  // carry the on-screen option and limit names into the exported image
+  const nameBar=document.getElementById('optionNameBar');
+  if(nameBar&&!nameBar.hidden&&nameBar.textContent.trim()){
+   const r=nameBar.getBoundingClientRect(),style=getComputedStyle(nameBar);
+   const x=(r.left-bounds.left)*sx,y=(r.top-bounds.top)*sy,w=r.width*sx,h=r.height*sy;
+   ctx.save();
+   ctx.font='600 '+(parseFloat(style.fontSize)*sy)+'px '+style.fontFamily;
+   ctx.textAlign='center';ctx.textBaseline='middle';ctx.direction='rtl';
+   const lines=[],limit=w-26*sx;
+   for(const paragraph of nameBar.textContent.split('\n')){
+    let current='';
+    for(const word of paragraph.split(' ')){
+     const test=current?current+' '+word:word;
+     if(current&&ctx.measureText(test).width>limit){lines.push(current);current=word;}else current=test;
+    }
+    lines.push(current);
+   }
+   ctx.fillStyle='rgba(24,16,10,.82)';ctx.strokeStyle='rgba(255,220,180,.35)';ctx.lineWidth=Math.max(1,sx);
+   ctx.beginPath();
+   if(ctx.roundRect)ctx.roundRect(x,y,w,h,10*sx);else ctx.rect(x,y,w,h);
+   ctx.fill();ctx.stroke();
+   ctx.fillStyle='#ffeccd';
+   const step=h/lines.length;
+   lines.forEach((line,i)=>ctx.fillText(line,x+w/2,y+step*(i+.5)));
+   ctx.restore();
+  }
   const blob=await new Promise(resolve=>output.toBlob(resolve,'image/png'));if(!blob)throw new Error('تعذر تجهيز الصورة. جرّب 4K.');
   const url=URL.createObjectURL(blob),a=document.createElement('a');a.download='Hameem-'+output.width+'x'+output.height+'.png';a.href=url;a.click();setTimeout(()=>URL.revokeObjectURL(url),60000);
   status.textContent='تم تجهيز الصورة '+output.width+' × '+output.height+(longest<requested?' (أقصى دقة يدعمها الجهاز)':'');
