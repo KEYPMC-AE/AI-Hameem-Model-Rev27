@@ -4241,7 +4241,7 @@ const limit1000Group=new THREE.Group();limit1000Group.name='Limit 1000 m from th
   ...corners[0].toArray(),...corners[1].toArray(),...corners[2].toArray(),
   ...corners[0].toArray(),...corners[2].toArray(),...corners[3].toArray()],3));
  faceGeometry.computeVertexNormals();faceGeometry.computeBoundingSphere();
- const face=new THREE.Mesh(faceGeometry,new THREE.MeshBasicMaterial({color:0x7a4a22,transparent:true,opacity:.45,side:THREE.DoubleSide,depthWrite:false,polygonOffset:true,polygonOffsetFactor:-2,polygonOffsetUnits:-2}));
+ const face=new THREE.Mesh(faceGeometry,new THREE.MeshBasicMaterial({color:0x7a4a22,transparent:true,opacity:.55,side:THREE.DoubleSide,depthWrite:false,polygonOffset:true,polygonOffsetFactor:-2,polygonOffsetUnits:-2}));
  face.name='Limit 1000 m shading';face.renderOrder=28;limit1000Group.add(face);
  // brown edge, drawn like the other boundary outlines
  const edgeMaterial=backfillMaterial(0x5a321b,3);
