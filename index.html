@@ -2508,7 +2508,7 @@ const summitPatch=new THREE.Mesh(summitPatchGeometry,new THREE.MeshBasicMaterial
 const arrowTop=currentPeakPoint.clone().add(new THREE.Vector3(0,200,0));
 const summitArrow=new THREE.ArrowHelper(new THREE.Vector3(0,-1,0),arrowTop,195,0x000000,30,20);summitArrow.traverse(o=>{if(o.material){o.material.depthTest=false;o.material.depthWrite=false;o.material.toneMapped=false;}o.renderOrder=132;});currentPeakMark.add(summitArrow);
 const peakCanvas=document.createElement('canvas');peakCanvas.width=1024;peakCanvas.height=160;const peakCtx=peakCanvas.getContext('2d');peakCtx.direction='ltr';peakCtx.font='bold 70px Arial';peakCtx.textAlign='center';peakCtx.textBaseline='middle';peakCtx.lineWidth=10;peakCtx.strokeStyle='#fff8e8';peakCtx.fillStyle='#000000';peakCtx.fillText('+500',512,80);
-const peakTex=new THREE.CanvasTexture(peakCanvas);peakTex.encoding=THREE.sRGBEncoding;const currentPeakText=new THREE.Sprite(new THREE.SpriteMaterial({map:peakTex,depthTest:false,depthWrite:false,sizeAttenuation:false}));currentPeakText.material.toneMapped=false;currentPeakText.position.copy(arrowTop).add(new THREE.Vector3(0,35,0));currentPeakText.scale.set(.23,.036,1);currentPeakText.renderOrder=133;currentPeakMark.add(currentPeakText);
+const peakTex=new THREE.CanvasTexture(peakCanvas);peakTex.encoding=THREE.sRGBEncoding;const currentPeakText=new THREE.Sprite(new THREE.SpriteMaterial({map:peakTex,depthTest:false,depthWrite:false,sizeAttenuation:false}));currentPeakText.material.toneMapped=false;currentPeakText.position.copy(arrowTop).add(new THREE.Vector3(0,35,0));currentPeakText.scale.set(.23,.036,1);currentPeakText.material.rotation=Math.PI/2;currentPeakText.renderOrder=133;currentPeakMark.add(currentPeakText);
 // The same label style as +500, naming what the arrow points at.
 const summitPlaceCanvas=document.createElement('canvas');summitPlaceCanvas.width=1024;summitPlaceCanvas.height=160;
 const summitPlaceCtx=summitPlaceCanvas.getContext('2d');summitPlaceCtx.direction='rtl';summitPlaceCtx.font='bold 70px Arial';summitPlaceCtx.textAlign='center';summitPlaceCtx.textBaseline='middle';summitPlaceCtx.fillStyle='#000000';summitPlaceCtx.fillText('موقع القمة',512,80);
@@ -2518,7 +2518,7 @@ summitPlaceText.material.toneMapped=false;summitPlaceText.position.copy(currentP
 // offset on screen, not in the scene, so it clears +500 from every angle
 summitPlaceText.center.set(.5,-.35);
 summitPlaceText.scale.copy(currentPeakText.scale);summitPlaceText.onBeforeRender=()=>summitPlaceText.scale.copy(currentPeakText.scale);
-summitPlaceText.renderOrder=133;currentPeakMark.add(summitPlaceText);
+summitPlaceText.material.rotation=Math.PI/2;summitPlaceText.renderOrder=133;currentPeakMark.add(summitPlaceText);
 
 
 function unpackModelAsset(buffer){
@@ -4398,7 +4398,7 @@ for(const plan of LIMIT_PLANS)buildLimitPlan(plan);
   const name=new THREE.Sprite(new THREE.SpriteMaterial({map:nameTex,depthTest:false,depthWrite:false,sizeAttenuation:false}));
   name.material.toneMapped=false;name.position.set(x,z+205,-n);
   name.scale.copy(currentPeakText.scale);name.onBeforeRender=()=>name.scale.copy(currentPeakText.scale);
-  name.renderOrder=133;group.add(name);
+  name.material.rotation=Math.PI/2;name.renderOrder=133;group.add(name);
  }
 }
 
