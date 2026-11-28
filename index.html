@@ -2520,7 +2520,7 @@ const summitPlaceTex=new THREE.CanvasTexture(summitPlaceCanvas);summitPlaceTex.e
 const summitPlaceText=new THREE.Sprite(new THREE.SpriteMaterial({map:summitPlaceTex,depthTest:false,depthWrite:false,sizeAttenuation:false}));
 summitPlaceText.material.toneMapped=false;summitPlaceText.position.copy(currentPeakText.position);
 // offset on screen, not in the scene, so it clears +500 from every angle
-summitPlaceText.center.set(.5,-.35);
+summitPlaceText.center.set(.5,-.08);
 summitPlaceText.scale.copy(currentPeakText.scale);
 summitPlaceText.onBeforeRender=(renderer,scene,camera)=>{summitPlaceText.scale.copy(currentPeakText.scale);summitPlaceText.material.rotation=callOutRotation(camera);};
 summitPlaceText.renderOrder=133;currentPeakMark.add(summitPlaceText);
