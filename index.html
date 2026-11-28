@@ -4264,7 +4264,7 @@ const LIMIT_PLANS=[
         {value:'1000',line:[[217784.307,2524860.4818],[217784.307,2525860.4818]],ext:[[217694.9704,2524860.4818],[217694.9704,2525860.4818]],text:[217782.406,2525360.4818],angle:90},
         {value:'1000',line:[[216694.9704,2526920.665],[217694.9704,2526920.665]],ext:[[216694.9704,2526860.4818],[217694.9704,2526860.4818]],text:[217194.9704,2526922.566],angle:0},
         {value:'1000',line:[[216694.9704,2524808.033],[217694.9704,2524808.033]],ext:[[216694.9704,2524860.4818],[217694.9704,2524860.4818]],text:[217194.9704,2524809.934],angle:0}]},
- {id:'limitBase1000',name:'Limit 1000 m from the base',level:80,drape:true,ceiling:150,offsetDims:true,edgeColour:0xffffff,edgeWidth:7,drops:false,
+ {id:'limitBase1000',name:'Limit 1000 m from the base',level:80,overlay:true,offsetDims:true,edgeColour:0xffffff,edgeWidth:7,drops:false,
   ring:[[217695.5954,2524064.1054],[217695.5954,2527703.734],[215487.9419,2527703.734],[215487.9419,2524064.1054]],
   dims:[{value:'1000',line:[[217933.775,2526703.734],[217933.775,2527703.734]],ext:[[217695.383,2526703.734],[217694.97,2527703.734]],text:[217931.874,2527203.734],angle:90},
         {value:'1000',line:[[217935.025,2524064.105],[217935.025,2525064.105]],ext:[[217694.97,2524064.105],[217694.97,2525064.105]],text:[217933.124,2524564.105],angle:90},
@@ -4314,8 +4314,8 @@ function buildLimitPlan(plan){
    ...corners[0].toArray(),...corners[2].toArray(),...corners[3].toArray()],3));
  }
  faceGeometry.computeVertexNormals();faceGeometry.computeBoundingSphere();
- const face=new THREE.Mesh(faceGeometry,new THREE.MeshBasicMaterial({color:limitGrey,transparent:true,opacity:.55,side:THREE.DoubleSide,depthWrite:false,polygonOffset:true,polygonOffsetFactor:-2,polygonOffsetUnits:-2}));
- face.name=plan.name+' shading';face.renderOrder=28;group.add(face);
+ const face=new THREE.Mesh(faceGeometry,new THREE.MeshBasicMaterial({color:limitGrey,transparent:true,opacity:.55,side:THREE.DoubleSide,depthWrite:false,depthTest:!plan.overlay,polygonOffset:true,polygonOffsetFactor:-2,polygonOffsetUnits:-2}));
+ face.name=plan.name+' shading';face.renderOrder=plan.overlay?135:28;group.add(face);
  // brown edge, drawn like the other boundary outlines
  const edgeMaterial=backfillMaterial(plan.edgeColour??0x5a321b,plan.edgeWidth??3);
  edgeMaterial.fragmentShader=edgeMaterial.fragmentShader.replace('opacity*0.55','opacity*0.95');
