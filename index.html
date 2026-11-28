@@ -202,7 +202,7 @@
   <h2>حدود الدفان لزاوية ميل الرامب <bdi dir="ltr">18°</bdi></h2><div class="backfillAngleRow" role="group" aria-label="حدود الدفان 18 درجة"><button type="button" id="boundaryToggle2" class="boundaryToggle" aria-pressed="false" style="--boundary-color:#5a321b"><span class="boundarySwatch"></span><span>حدود <bdi>600</bdi></span></button><button type="button" id="boundaryToggle1" class="boundaryToggle" aria-pressed="false" style="--boundary-color:#5a321b"><span class="boundarySwatch"></span><span>حدود <bdi>700</bdi></span></button><button type="button" id="boundaryToggle0" class="boundaryToggle" aria-pressed="false" style="--boundary-color:#5a321b"><span class="boundarySwatch"></span><span>حدود <bdi>1000</bdi></span></button></div>
 <h2>حدود الدفان لزاوية ميل الرامب <bdi dir="ltr">23°</bdi></h2><div class="backfillAngleRow" role="group" aria-label="حدود الدفان 23 درجة"><button type="button" id="boundaryToggle3" class="boundaryToggle" aria-pressed="false" style="--boundary-color:#5a321b"><span class="boundarySwatch"></span><span>حدود <bdi>600</bdi></span></button><button type="button" id="boundaryToggle4" class="boundaryToggle" aria-pressed="false" style="--boundary-color:#5a321b"><span class="boundarySwatch"></span><span>حدود <bdi>700</bdi></span></button><button type="button" id="boundaryToggle5" class="boundaryToggle" aria-pressed="false" style="--boundary-color:#5a321b"><span class="boundarySwatch"></span><span>حدود <bdi>1000</bdi></span></button></div>
 
-<div id="topOptionsControls" style="margin:12px 0;padding-top:12px;border-top:1px solid rgba(255,220,180,.25)"><div dir="ltr" style="font-size:11px;color:#d8bd92;margin:0 0 8px;text-align:right">300×300 Top Options</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;direction:ltr"><button type="button" id="top300Toggle" class="boundaryToggle" aria-pressed="false" style="width:100%;--boundary-color:#5a321b"><span class="boundarySwatch"></span><span dir="ltr">Option 1</span></button><button type="button" id="option2Toggle" class="boundaryToggle" aria-pressed="false" style="width:100%;--boundary-color:#5a321b"><span class="boundarySwatch"></span><span dir="ltr">Option 2</span></button></div><button type="button" id="option3Toggle" class="boundaryToggle" aria-pressed="false" style="width:100%;margin-top:8px;--boundary-color:#5a321b" title="OP 2 MOUNTAIN TOP STAGE 2 491 to 600 16deg x 33deg"><span class="boundarySwatch"></span><span dir="rtl">المخطط الحالي</span></button></div>
+<div id="topOptionsControls" style="margin:12px 0;padding-top:12px;border-top:1px solid rgba(255,220,180,.25)"><div dir="ltr" style="font-size:11px;color:#d8bd92;margin:0 0 8px;text-align:right">300×300 Top Options</div><div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;direction:ltr"><button type="button" id="top300Toggle" class="boundaryToggle" aria-pressed="false" style="width:100%;--boundary-color:#5a321b"><span class="boundarySwatch"></span><span dir="ltr">Option 1</span></button><button type="button" id="option2Toggle" class="boundaryToggle" aria-pressed="false" style="width:100%;--boundary-color:#5a321b"><span class="boundarySwatch"></span><span dir="ltr">Option 2</span></button></div><button type="button" id="option3Toggle" class="boundaryToggle" aria-pressed="false" style="width:100%;margin-top:8px;--boundary-color:#5a321b" title="OP 2 MOUNTAIN TOP STAGE 2 491 to 600 16deg x 33deg"><span class="boundarySwatch"></span><span dir="rtl">المخطط الحالي</span></button></div><div id="limit1000Controls" style="margin:12px 0;padding-top:12px;border-top:1px solid rgba(255,220,180,.25)"><button type="button" id="limit1000Toggle" class="boundaryToggle" aria-pressed="false" style="width:100%;--boundary-color:#5a321b;white-space:normal;text-align:center;line-height:1.35;padding:7px 8px"><span class="boundarySwatch"></span><span dir="rtl" style="font-size:11.5px">حدود 1000 متر في اتجاه الشمال , الجنوب والغرب - من القمة</span></button></div>
 <details id="operationsPanel" style="margin-top:10px"><summary style="cursor:pointer">توزيع التشغيل</summary>
 <label class="chkRow"><input id="chkOperations" type="checkbox"> إظهار الخطوط كاد</label>
 <label class="chkRow"><input id="chkConveyorRealism" type="checkbox" checked> إظهار الخطوط بواقعية</label>
@@ -4203,6 +4203,70 @@ function addOptionSummitBoundary(parent,path,name){
 
 
 
+
+function addFlatPlanLabel(text,x,y,level,angle,parent){
+ // Same canvas text as the model's own labels, kept flat at the given level.
+ const canvas=document.createElement('canvas'),ctx=canvas.getContext('2d');
+ const font='160px Calibri, Arial, sans-serif';ctx.font=font;
+ const measure=ctx.measureText(text),asc=measure.actualBoundingBoxAscent||116,desc=measure.actualBoundingBoxDescent||0,pad=8;
+ canvas.width=Math.ceil(measure.width+pad*2);canvas.height=Math.ceil(asc+desc+pad*2);
+ ctx.font=font;ctx.textBaseline='alphabetic';ctx.fillStyle='#000';ctx.fillText(text,pad,pad+asc);
+ const units=PLAN_LABEL_HEIGHT/asc,w=canvas.width*units,h=canvas.height*units;
+ const texture=new THREE.CanvasTexture(canvas);texture.anisotropy=Math.min(8,renderer.capabilities.getMaxAnisotropy());
+ const geometry=new THREE.PlaneGeometry(w,h),position=geometry.attributes.position;
+ const radians=angle*Math.PI/180,cs=Math.cos(radians),sn=Math.sin(radians);
+ for(let i=0;i<position.count;i++){
+  const u=position.getX(i),v=position.getY(i);
+  position.setXYZ(i,x+cs*u-sn*v-CX,level+.3,CY-(y+sn*u+cs*v));
+ }
+ geometry.computeBoundingSphere();
+ const material=new THREE.MeshBasicMaterial({map:texture,color:0x000000,transparent:true,side:THREE.DoubleSide,depthWrite:false,depthTest:false});
+ const mesh=new THREE.Mesh(geometry,material);mesh.name=text;mesh.renderOrder=137;mesh.frustumCulled=false;parent.add(mesh);
+ return mesh;
+}
+const PLAN_LABEL_HEIGHT=20;   // the height the model's own labels use
+
+// 1000 m limit north, south and west of the summit, taken from the plan DXF.
+const LIMIT1000={level:493.864,
+ ring:[[217694.9704,2524860.4818],[217694.9704,2526860.4818],[216694.9704,2526860.4818],[216694.9704,2524860.4818]],
+ dims:[{value:'2000',edge:216694.9704,line:216658.322,from:2524860.4818,to:2526860.4818,text:[216656.421,2525860.4818]},
+       {value:'1000',edge:217694.9704,line:217784.307,from:2525860.4818,to:2526860.4818,text:[217782.406,2526360.4818]},
+       {value:'1000',edge:217694.9704,line:217784.307,from:2524860.4818,to:2525860.4818,text:[217782.406,2525360.4818]}]};
+const limit1000Group=new THREE.Group();limit1000Group.name='Limit 1000 m from the summit';limit1000Group.visible=false;scene.add(limit1000Group);
+{
+ const level=LIMIT1000.level;
+ const point=(x,y)=>new THREE.Vector3(x-CX,level,CY-y);
+ // shaded face, kept see-through so the model stays readable underneath
+ const corners=LIMIT1000.ring.map(([x,y])=>point(x,y));
+ const faceGeometry=new THREE.BufferGeometry();
+ faceGeometry.setAttribute('position',new THREE.Float32BufferAttribute([
+  ...corners[0].toArray(),...corners[1].toArray(),...corners[2].toArray(),
+  ...corners[0].toArray(),...corners[2].toArray(),...corners[3].toArray()],3));
+ faceGeometry.computeVertexNormals();faceGeometry.computeBoundingSphere();
+ const face=new THREE.Mesh(faceGeometry,new THREE.MeshBasicMaterial({color:0x7a4a22,transparent:true,opacity:.45,side:THREE.DoubleSide,depthWrite:false,polygonOffset:true,polygonOffsetFactor:-2,polygonOffsetUnits:-2}));
+ face.name='Limit 1000 m shading';face.renderOrder=28;limit1000Group.add(face);
+ // brown edge, drawn like the other boundary outlines
+ const edgeMaterial=backfillMaterial(0x5a321b,3);
+ edgeMaterial.fragmentShader=edgeMaterial.fragmentShader.replace('opacity*0.55','opacity*0.95');
+ const edge=new THREE.Mesh(backfillGeometry([{points:LIMIT1000.ring.map(([x,y])=>[x,y,level]),closed:true}]),edgeMaterial);
+ edge.name='Limit 1000 m edge';edge.renderOrder=136;edge.frustumCulled=false;limit1000Group.add(edge);
+ // dimensions, as placed in the plan
+ const dimMaterial=backfillMaterial(0x5a321b,2);
+ const dimPaths=[];
+ for(const dim of LIMIT1000.dims){
+  dimPaths.push({points:[[dim.line,dim.from,level],[dim.line,dim.to,level]],closed:false});
+  for(const y of [dim.from,dim.to])dimPaths.push({points:[[dim.edge,y,level],[dim.line+(dim.line-dim.edge)*.08,y,level]],closed:false});
+ }
+ const dimLines=new THREE.Mesh(backfillGeometry(dimPaths),dimMaterial);
+ dimLines.name='Limit 1000 m dimension lines';dimLines.renderOrder=136;dimLines.frustumCulled=false;limit1000Group.add(dimLines);
+ for(const dim of LIMIT1000.dims)addFlatPlanLabel(dim.value,dim.text[0],dim.text[1],level,90,limit1000Group);
+}
+let limit1000Enabled=false;
+function syncLimit1000(){const on=limit1000Enabled&&mode==='current';limit1000Group.visible=on;
+ const button=document.getElementById('limit1000Toggle');button.setAttribute('aria-pressed',String(on));button.classList.toggle('active',on);
+ operationsRevision++;renderer.shadowMap.needsUpdate=true;}
+document.getElementById('limit1000Toggle').addEventListener('click',()=>{limit1000Enabled=!limit1000Enabled;syncLimit1000();});
+const limit1000ApplyMode=applyMode;applyMode=function(){limit1000ApplyMode();syncLimit1000();};
 
 const rampCadGroup=new THREE.Group();operationsGroup.add(rampCadGroup);
 for(const r of conveyorConfig.routes.filter(r=>r.userData?.rampAligned)){
