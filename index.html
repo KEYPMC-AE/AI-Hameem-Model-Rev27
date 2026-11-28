@@ -2620,9 +2620,22 @@ for(const item of summitBranchShadePaths){
 }
 
 // Keep the summit label +500 while retaining the measured survey elevation.
-let peakBest=-1,peakDistance=Infinity;
-for(let k=0;k<N;k++)if(maskCurrent[k]&&elevCurrentRaw[k]>=STATS.current_zmax-.1){const ix=k%NX,iy=Math.floor(k/NX),x=XMIN+ix*(XMAX-XMIN)/(NX-1)-CX,z=CY-(YMIN+iy*(YMAX-YMIN)/(NY-1)),d=(x-currentPeakPoint.x)**2+(z-currentPeakPoint.z)**2;if(d<peakDistance){peakDistance=d;peakBest=k;}}
-if(peakBest>=0){const ix=peakBest%NX,iy=Math.floor(peakBest/NX),p=new THREE.Vector3(XMIN+ix*(XMAX-XMIN)/(NX-1)-CX,elevCurrentRaw[peakBest]+.6,CY-(YMIN+iy*(YMAX-YMIN)/(NY-1)));currentPeakMark.position.copy(p).sub(currentPeakPoint);}
+// Sit the mark on the middle of the highest ground, not just the nearest high cell.
+{
+ let sumX=0,sumZ=0,top=-Infinity,count=0;
+ for(let k=0;k<N;k++){
+  if(!maskCurrent[k]||elevCurrentRaw[k]<STATS.current_zmax-1.5)continue;
+  const ix=k%NX,iy=Math.floor(k/NX);
+  const x=XMIN+ix*(XMAX-XMIN)/(NX-1)-CX,z=CY-(YMIN+iy*(YMAX-YMIN)/(NY-1));
+  if(Math.hypot(x-currentPeakPoint.x,z-currentPeakPoint.z)>400)continue;
+  sumX+=x;sumZ+=z;top=Math.max(top,elevCurrentRaw[k]);count++;
+ }
+ if(count){
+  const centre=new THREE.Vector3(sumX/count,top+.6,sumZ/count);
+  currentPeakMark.position.copy(centre).sub(currentPeakPoint);
+  currentPeakMark.userData.summitCells=count;
+ }
+}
 
 
 // ======================================================================
