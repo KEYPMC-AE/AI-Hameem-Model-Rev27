@@ -4290,32 +4290,14 @@ function buildLimitPlan(plan){
  edgeMaterial.fragmentShader=edgeMaterial.fragmentShader.replace('opacity*0.55','opacity*0.95');
  const edge=new THREE.Mesh(backfillGeometry([{points:plan.ring.map(([x,y])=>[x,y,level]),closed:true}]),edgeMaterial);
  edge.name=plan.name+' edge';edge.renderOrder=136;edge.frustumCulled=false;group.add(edge);
- // dimensions: drawn on the ground, tied up to the rectangle by vertical leaders
- const ground=(E,N)=>{
-  let z=operationsHeight(E-CX,N-CY);
-  if(z===null||!Number.isFinite(z)){
-   const ix=Math.max(0,Math.min(NX-1,Math.round((E-XMIN)/(XMAX-XMIN)*(NX-1))));
-   const iy=Math.max(0,Math.min(NY-1,Math.round((N-YMIN)/(YMAX-YMIN)*(NY-1))));
-   z=elevCurrentRaw[iy*NX+ix];
-  }
-  return z+.6;
- };
- const dimPaths=[];
- for(const dim of plan.dims){
-  dimPaths.push({points:[[dim.line[0][0],dim.line[0][1],level],[dim.line[1][0],dim.line[1][1],level]],closed:false});
-  for(let k=0;k<2;k++){
-   const start=dim.ext[k],stop=dim.line[k];
-   const dx=stop[0]-start[0],dy=stop[1]-start[1],span=Math.hypot(dx,dy);
-   // witness line carried down from the boundary point to the ground
-   const ux=span>1?dx/span:1,uy=span>1?dy/span:0;
-   dimPaths.push({points:[[start[0],start[1],level],[start[0]+ux*.05,start[1]+uy*.05,ground(start[0],start[1])]],closed:false});
-   if(span<1)continue;
-   dimPaths.push({points:[[start[0],start[1],level],[stop[0]+dx*.12,stop[1]+dy*.12,level]],closed:false});
-  }
- }
+ // dimensions: each one measured along the rectangle's own boundary, no witness arms
+ const dimPaths=plan.dims.map(dim=>({points:[[dim.ext[0][0],dim.ext[0][1],level],[dim.ext[1][0],dim.ext[1][1],level]],closed:false}));
  const dimLines=new THREE.Mesh(backfillGeometry(dimPaths),backfillMaterial(0x000000,5));
  dimLines.name=plan.name+' dimension lines';dimLines.renderOrder=136;dimLines.frustumCulled=false;group.add(dimLines);
- for(const dim of plan.dims)addFlatPlanLabel(dim.value+' m',dim.text[0],dim.text[1],level,dim.angle,group);
+ for(const dim of plan.dims){
+  const midX=(dim.ext[0][0]+dim.ext[1][0])/2,midY=(dim.ext[0][1]+dim.ext[1][1])/2;
+  addFlatPlanLabel(dim.value+' m',midX,midY,level,dim.angle,group);
+ }
  let enabled=false;
  const button=document.getElementById(plan.id+'Toggle');
  const sync=()=>{const on=enabled&&mode==='current';group.visible=on;
